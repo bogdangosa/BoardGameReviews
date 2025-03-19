@@ -6,8 +6,8 @@
       <h1 class="logo bold">Board Game Reviews</h1>
       <nav>
         <ul>
-          <li class=""><a class="nav-link" href="/">Browse</a></li>
-          <li><a class="nav-link" href="/account">Account</a></li>
+          <li class=""><NuxtLink class="nav-link" to="/">Browse</NuxtLink></li>
+          <li><NuxtLink class="nav-link" to="/account">Account</NuxtLink></li>
         </ul>
       </nav>
     </div>
