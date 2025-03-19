@@ -11,13 +11,13 @@ const boardgamesData = ref([
     id: 1,
     title: "Azul Duel",
     description: "Decorate a palace ceiling after creating your own pattern.",
-    image: "azul_duel.png",
+    image: "azul_duel.jpg",
   },
   {
     id: 2,
     title: "Calico",
     description: "Sew a quilt, collect buttons, attract cats!",
-    image: "calico.png",
+    image: "calico.jpg",
   },
   {
     id: 3,

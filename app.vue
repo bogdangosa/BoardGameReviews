@@ -41,6 +41,12 @@
 .bg-neutral2 {
   background-color: var(--background-color-2);
 }
+.c-background1 {
+  color: var(--background-color-1);
+}
+.c-background2 {
+  color: var(--background-color-2);
+}
 
 h1 {
   font-size: 40px;
