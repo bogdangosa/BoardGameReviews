@@ -38,12 +38,13 @@
 </template>
 
 <script lang="ts" setup>
-interface Boardgame {
+interface IBoardgame {
   id: number;
   title: string;
   description: string;
   image: string;
   category: string;
+  rating: number;
 }
 const categories = [
   "All",
@@ -62,7 +63,7 @@ function updateSelectedCategory(newCategory: string) {
 }
 
 const { boardgamesData, updateBoardgamesData } = inject<{
-  boardgamesData: Ref<Boardgame[]>;
+  boardgamesData: Ref<IBoardgame[]>;
   updateBoardgamesData: (newData: any) => void;
 }>("boardgamesData")!;
 
@@ -77,16 +78,17 @@ const displayedBoardgames = computed(() => {
 
 const isModalOpened = ref(false);
 
-function addBoardgame(newBoardgame: { name: string; description: string }) {
+function addBoardgame(newBoardgame: IBoardgame) {
   console.log(newBoardgame);
   updateBoardgamesData([
     ...boardgamesData.value,
     {
       id: boardgamesData.value.length + 1,
-      title: newBoardgame.name,
+      title: newBoardgame.title,
       description: newBoardgame.description,
-      image: "",
-      category: "Abstract",
+      image: newBoardgame.image,
+      category: newBoardgame.category,
+      rating: newBoardgame.rating,
     },
   ]);
 }

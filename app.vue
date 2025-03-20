@@ -41,6 +41,16 @@
 .bg-neutral2 {
   background-color: var(--background-color-2);
 }
+.bg-neutral3 {
+  background-color: var(--text-color-3);
+}
+bg-background1 {
+  background-color: var(--background-color-1);
+}
+.bg-background2 {
+  background-color: var(--background-color-2);
+}
+
 .c-background1 {
   color: var(--background-color-1);
 }

@@ -24,6 +24,25 @@
             class="bg-neutral1 w-full p8"
           ></textarea>
         </div>
+        <div class="flex gap-4">
+          <div class="form-group">
+            <p for="image">Image:</p>
+            <input
+              class="file-input bg-neutral1 w-fit p-4"
+              type="file"
+              name="image"
+              @change="previewFiles"
+            />
+          </div>
+          <div class="form-group">
+            <p for="category">Category:</p>
+            <Dropdown
+              :options="categories"
+              v-on:update:selectedOption="updateSelectedCategory"
+            />
+          </div>
+        </div>
+
         <div class="flex justify-end gap-2">
           <Button color="accent1" type="submit">Add Board Game</Button>
         </div>
@@ -38,7 +57,16 @@ export default {
   setup() {
     const boardGameName = ref("");
     const boardGameDescription = ref("");
-    return { boardGameName, boardGameDescription };
+    const boardGameImage = ref("");
+    const categories = [
+      "All",
+      "Abstract",
+      "Strategy",
+      "Party",
+      "Family",
+      "Cooperative",
+    ];
+    return { boardGameName, boardGameDescription, boardGameImage, categories };
   },
 
   methods: {
@@ -47,10 +75,23 @@ export default {
     },
     addBoardGame() {
       this.$emit("addBoardgame", {
-        name: this.boardGameName,
+        title: this.boardGameName,
         description: this.boardGameDescription,
+        image: this.boardGameImage,
+        category: "Abstract",
+        rating: 0,
       });
       this.closeModal();
+    },
+    previewFiles(event) {
+      console.log(event.target.files);
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.boardGameImage = reader.result;
+        console.log(reader.result);
+      };
     },
   },
 };
@@ -92,5 +133,11 @@ export default {
 
 .form-group {
   margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.file-input {
+  border-radius: 8px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-neutral1 p-2 rounded-lg">
+  <div class="bg-neutral1 p-2 rounded-lg w-fit">
     <select class="outline-none" v-model="selectedOption">
       <option value="" disabled selected>Select an option</option>
       <option v-for="option in options" :value="option">

@@ -11,28 +11,32 @@ const boardgamesData = ref([
     id: 1,
     title: "Azul Duel",
     description: "Decorate a palace ceiling after creating your own pattern.",
-    image: "azul_duel.jpg",
+    image: "/azul_duel.jpg",
+    rating: 8.5,
     category: "Abstract",
   },
   {
     id: 2,
     title: "Calico",
     description: "Sew a quilt, collect buttons, attract cats!",
-    image: "calico.jpg",
+    image: "/calico.jpg",
+    rating: 7.5,
     category: "Abstract",
   },
   {
     id: 3,
     title: "Dune Imperium",
     description: "Influence, intrigue, and combat in the universe of Dune.",
-    image: "dune_imperium.jpg",
+    image: "/dune_imperium.jpg",
+    rating: 8.0,
     category: "Strategy",
   },
   {
     id: 4,
     title: "Lost Ruins of Arnak",
     description: "Explore an island, discover artifacts, and defeat guardians.",
-    image: "lost_ruins_of_arnak.jpg",
+    image: "/lost_ruins_of_arnak.jpg",
+    rating: 8.0,
     category: "Strategy",
   },
   {
@@ -40,7 +44,8 @@ const boardgamesData = ref([
     title: "Pandemic Legacy",
     description:
       "Mutating diseases are spreading around the world - can your team save humanity? ",
-    image: "pandemic_legacy.jpg",
+    image: "/pandemic_legacy.jpg",
+    rating: 9.5,
     category: "Cooperative",
   },
   {
@@ -48,7 +53,8 @@ const boardgamesData = ref([
     title: "The Crew",
     description:
       "Complete missions in space in this cooperative trick-taking game.",
-    image: "the_crew.jpg",
+    image: "/the_crew.jpg",
+    rating: 8.0,
     category: "Cooperative",
   },
 ]);

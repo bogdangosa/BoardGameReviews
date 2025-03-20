@@ -2,8 +2,11 @@
   <div class="modal">
     <div class="overlay z-0" @click="closeModal"></div>
     <div class="modal-content bg-neutral2 p-8 z-2">
-      <h2>Are you sure you want to delete this?</h2>
-      <Button color="red" @click="deleteBoardGame">Delete</Button>
+      <h2 class="mb-4">Are you sure you want to delete this?</h2>
+      <div class="flex w-full justify-end gap-2">
+        <Button color="neutral3" @click="closeModal">Cancel</Button>
+        <Button color="red" @click="deleteBoardGame">Delete</Button>
+      </div>
     </div>
   </div>
 </template>

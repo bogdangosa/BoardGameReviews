@@ -2,16 +2,16 @@
   <div>
     <div class="hero-game flex justify-center">
       <img class="cover-image" :src="`/azul_duel_cover.jpg`" />
-      <div class="container p-8 gap-4 flex flex-col items-start">
-        <div class="flex gap-8 h-full">
+      <div class="container p-4 sm:p-8 gap-4 flex flex-col items-start">
+        <div class="flex flex-col md:flex-row gap-8 h-full">
           <img
             class="game-image"
-            :src="`/${thisBoardgame.image}`"
+            :src="thisBoardgame.image"
             alt="Boardgame cover"
           />
           <div class="text-container">
             <div class="score-container flex justify-center items-center">
-              <span class="score">8.5 </span>
+              <span class="score">{{ thisBoardgame.rating }} </span>
             </div>
             <div class="flex gap-4">
               <h2 class="c-background1 bold">
@@ -39,8 +39,8 @@
         </div>
       </div>
     </div>
-    <main>
-      <div class="container p-8">
+    <main class="flex justify-center">
+      <div class="container p-4 sm:p-8">
         <h2 class="c-text1">Description:</h2>
         <p class="c-text3">
           Decorate the magnificent ceilings of the palace. Will the vaults look
@@ -69,6 +69,8 @@ interface Boardgame {
   title: string;
   description: string;
   image: string;
+  category: string;
+  rating: number;
 }
 
 const isDeleteModalOpened = ref(false);
@@ -80,6 +82,8 @@ const thisBoardgame = ref({
   title: "aaa",
   description: "bbb",
   image: "",
+  category: "",
+  rating: 0,
 });
 
 const injectedData = inject<{
@@ -140,6 +144,7 @@ function deleteBoardgame() {
 .game-image {
   border-radius: 0.5rem;
   height: 12rem;
+  width: 12rem;
 }
 .button {
   cursor: pointer;
