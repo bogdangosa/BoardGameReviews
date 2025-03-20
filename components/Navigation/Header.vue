@@ -3,7 +3,7 @@
     <div
       class="header-container container flex justify-between align-middle p-8"
     >
-      <h1 class="logo bold">Board Game Reviews</h1>
+      <NuxtLink to="/"><h1 class="logo bold">Board Game Reviews</h1></NuxtLink>
       <nav>
         <ul>
           <li class=""><NuxtLink class="nav-link" to="/">Browse</NuxtLink></li>

@@ -1,5 +1,6 @@
 <template>
   <div class="board-game-card">
+    <img class="board-game-image mb-2" :src="image" alt="Board game cover" />
     <h2>{{ title }}</h2>
     <p>{{ description }}</p>
   </div>
@@ -17,21 +18,19 @@ export default {
       type: String,
       required: true,
     },
+    image: {
+      type: String,
+      default: "/calico.jpg",
+    },
   },
 };
 </script>
 
 <style scoped>
-.board-game-card {
-  border: 1px solid #ccc;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.board-game-card h2 {
-  margin: 0 0 8px;
-}
-.board-game-card p {
-  margin: 0;
+.board-game-image {
+  height: 180px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
 }
 </style>

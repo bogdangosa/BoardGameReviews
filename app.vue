@@ -48,6 +48,16 @@
   color: var(--background-color-2);
 }
 
+c-text1 {
+  color: var(--text-color-1);
+}
+.c-text2 {
+  color: var(--text-color-2);
+}
+.c-text3 {
+  color: var(--text-color-3);
+}
+
 h1 {
   font-size: 40px;
   font-weight: 700;

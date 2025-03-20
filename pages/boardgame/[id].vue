@@ -2,46 +2,52 @@
   <div>
     <div class="hero-game flex justify-center">
       <img class="cover-image" :src="`/azul_duel_cover.jpg`" />
-      <div class="flex container p-8 gap-8">
-        <img
-          class="game-image"
-          :src="`/${thisBoardgame.image}`"
-          alt="Boardgame cover"
-        />
-        <div class="text-container">
-          <div class="score-container flex justify-center items-center">
-            <span class="score">8.5 </span>
+      <div class="container p-8 gap-4 flex flex-col items-start">
+        <div class="flex gap-8 h-full">
+          <img
+            class="game-image"
+            :src="`/${thisBoardgame.image}`"
+            alt="Boardgame cover"
+          />
+          <div class="text-container">
+            <div class="score-container flex justify-center items-center">
+              <span class="score">8.5 </span>
+            </div>
+            <div class="flex gap-4">
+              <h2 class="c-background1 bold">
+                {{ thisBoardgame.id + ". " + thisBoardgame.title }}
+              </h2>
+              <img
+                class="button"
+                @click="isDeleteModalOpened = true"
+                :src="`/delete.svg`"
+                alt=""
+              />
+              <img
+                class="button"
+                @click="isEditModalOpened = true"
+                :src="`/edit.svg`"
+                alt=""
+              />
+            </div>
+            <p class="c-background1">{{ thisBoardgame.description }}</p>
           </div>
-          <div class="flex gap-4">
-            <h2 class="c-background1 bold">
-              {{ thisBoardgame.id + ". " + thisBoardgame.title }}
-            </h2>
-            <img
-              class="button"
-              @click="isDeleteModalOpened = true"
-              :src="`/delete.svg`"
-              alt=""
-            />
-            <img
-              class="button"
-              @click="isEditModalOpened = true"
-              :src="`/edit.svg`"
-              alt=""
-            />
-          </div>
-          <p class="c-background1">{{ thisBoardgame.description }}</p>
+        </div>
+        <div class="rating-container flex gap-2 justify-center items-center">
+          <p class="c-background1">my rating:</p>
+          <StarsRating :rating="8" />
         </div>
       </div>
     </div>
     <main>
       <div class="container p-8">
-        <h2>Description:</h2>
-        <p>
+        <h2 class="c-text1">Description:</h2>
+        <p class="c-text3">
           Decorate the magnificent ceilings of the palace. Will the vaults look
           more beautiful by day or by night? Azul Duel invites you to play with
           light and pit opposites against each other.
         </p>
-        <p>
+        <p class="c-text3">
           This competitive strategic game for two players retains the purity and
           elegance of the original Azul while adding an extra tactical dimension
           in which you determine the pattern in which tiles will be placed, in
@@ -106,7 +112,6 @@ function deleteBoardgame() {
 <style>
 .hero-game {
   position: relative;
-  height: 15rem;
 }
 
 .cover-image {
@@ -134,6 +139,7 @@ function deleteBoardgame() {
 }
 .game-image {
   border-radius: 0.5rem;
+  height: 12rem;
 }
 .button {
   cursor: pointer;
