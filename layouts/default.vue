@@ -14,6 +14,7 @@ const boardgamesData = ref([
     image: "/azul_duel.jpg",
     rating: 8.5,
     category: "Abstract",
+    myRating: 8,
   },
   {
     id: 2,
@@ -59,40 +60,10 @@ const boardgamesData = ref([
   },
 ]);
 
-const ratingsData = ref([
-  {
-    id: 1,
-    rating: 8.5,
-  },
-  {
-    id: 2,
-    rating: 7.5,
-  },
-  {
-    id: 4,
-    rating: 8.0,
-  },
-  {
-    id: 5,
-    rating: 9.5,
-  },
-  {
-    id: 6,
-    rating: 8.0,
-  },
-]);
-
 provide("boardgamesData", {
   boardgamesData: boardgamesData,
   updateBoardgamesData: (newData: any) => {
     boardgamesData.value = newData;
-  },
-});
-
-provide("ratingsData", {
-  ratings: ratingsData,
-  updateRatingsData: (newData: any) => {
-    ratingsData.value = newData;
   },
 });
 </script>

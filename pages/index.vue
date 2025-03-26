@@ -8,17 +8,28 @@
         <h2 class="home-page-hero-title">All Boardgames</h2>
         <div class="flex gap-2">
           <Dropdown
+            title="Sort by"
+            :options="sortings"
+            v-on:update:selectedOption="updateSelectedSorting"
+          />
+          <Dropdown
+            title="Category"
             :options="categories"
             v-on:update:selectedOption="updateSelectedCategory"
           />
-          <Button @click="isModalOpened = true">add your own</Button>
+          <Button data-test="add-boardgame-button" @click="isModalOpened = true"
+            >Add your own</Button
+          >
         </div>
       </div>
     </div>
     <div class="content flex justify-center">
       <div class="boardgames-table container p-8">
         <div v-for="boardgame in displayedBoardgames">
-          <NuxtLink :to="'/boardgame/' + boardgame.id">
+          <NuxtLink
+            :to="'/boardgame/' + boardgame.id"
+            :data-test="'boardgame-link-' + boardgame.id"
+          >
             <CardBoardGame
               :image="boardgame.image"
               :title="boardgame.title"
@@ -45,7 +56,9 @@ interface IBoardgame {
   image: string;
   category: string;
   rating: number;
+  myRating?: number;
 }
+
 const categories = [
   "All",
   "Abstract",
@@ -55,11 +68,19 @@ const categories = [
   "Cooperative",
 ];
 
+const sortings = ["Default", "Alphabetically", "Rating"];
+
 const selectedCategory = ref("All");
+const selectedSorting = ref("Default");
 
 function updateSelectedCategory(newCategory: string) {
   console.log(newCategory);
   selectedCategory.value = newCategory;
+}
+
+function updateSelectedSorting(newSorting: string) {
+  console.log(newSorting);
+  selectedSorting.value = newSorting;
 }
 
 const { boardgamesData, updateBoardgamesData } = inject<{
@@ -67,19 +88,33 @@ const { boardgamesData, updateBoardgamesData } = inject<{
   updateBoardgamesData: (newData: any) => void;
 }>("boardgamesData")!;
 
+console.log("here in testing", boardgamesData);
+
+const filterByCategory = (boardgame: IBoardgame, category: string) =>
+  category === "All" || boardgame.category === selectedCategory.value;
+
 const displayedBoardgames = computed(() => {
-  if (selectedCategory.value === "All") {
-    return boardgamesData.value;
-  }
-  return boardgamesData.value.filter(
-    (boardgame) => boardgame.category === selectedCategory.value
-  );
+  return boardgamesData.value
+    .filter((boardgame) => filterByCategory(boardgame, selectedCategory.value))
+    .sort((a, b) => {
+      if (selectedSorting.value === "Default") {
+        return 0;
+      }
+      if (selectedSorting.value === "Alphabetically") {
+        return a.title.localeCompare(b.title);
+      }
+      if (selectedSorting.value === "Rating") {
+        return b.rating - a.rating;
+      }
+      return 0;
+    });
 });
 
 const isModalOpened = ref(false);
 
 function addBoardgame(newBoardgame: IBoardgame) {
   console.log(newBoardgame);
+  console.log("Adding boardgame");
   updateBoardgamesData([
     ...boardgamesData.value,
     {
@@ -92,6 +127,7 @@ function addBoardgame(newBoardgame: IBoardgame) {
     },
   ]);
 }
+defineExpose({ addBoardgame });
 </script>
 
 <style>

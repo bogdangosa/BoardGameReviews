@@ -8,6 +8,7 @@
         <div class="form-group">
           <p for="name">Name:</p>
           <input
+            data-test="boardgame-title-input"
             class="bg-neutral1 w-full p-4"
             id="name"
             type="text"
@@ -20,14 +21,16 @@
 
           <textarea
             id="description"
+            data-test="boardgame-description-input"
             v-model="boardGameDescription"
-            class="bg-neutral1 w-full p8"
+            class="bg-neutral1 w-full p-4"
           ></textarea>
         </div>
         <div class="flex gap-4">
           <div class="form-group">
             <p for="image">Image:</p>
             <input
+              data-test="boardgame-image-input"
               class="file-input bg-neutral1 w-fit p-4"
               type="file"
               name="image"
@@ -37,14 +40,21 @@
           <div class="form-group">
             <p for="category">Category:</p>
             <Dropdown
+              title="Category"
               :options="categories"
+              data-test="boardgame-category-input"
               v-on:update:selectedOption="updateSelectedCategory"
             />
           </div>
         </div>
 
         <div class="flex justify-end gap-2">
-          <Button color="accent1" type="submit">Add Board Game</Button>
+          <Button
+            data-test="submit-boardgame-button"
+            color="accent1"
+            type="submit"
+            >Add Board Game</Button
+          >
         </div>
       </form>
     </div>
@@ -52,21 +62,29 @@
 </template>
 
 <script>
+import isDataValid from "~/utils/validators";
+
 export default {
   name: "AddBoardGame",
   setup() {
     const boardGameName = ref("");
     const boardGameDescription = ref("");
     const boardGameImage = ref("");
+    const selectedCategory = ref("Abstract");
     const categories = [
-      "All",
       "Abstract",
       "Strategy",
       "Party",
       "Family",
       "Cooperative",
     ];
-    return { boardGameName, boardGameDescription, boardGameImage, categories };
+    return {
+      boardGameName,
+      boardGameDescription,
+      boardGameImage,
+      categories,
+      selectedCategory,
+    };
   },
 
   methods: {
@@ -74,11 +92,24 @@ export default {
       this.$emit("close");
     },
     addBoardGame() {
+      console.log("addBoardGame");
+      if (
+        !isDataValid(
+          this.boardGameName,
+          this.boardGameDescription,
+          this.boardGameImage,
+          this.selectedCategory,
+          alert
+        )
+      ) {
+        console.log("Data is not valid");
+        return;
+      }
       this.$emit("addBoardgame", {
         title: this.boardGameName,
         description: this.boardGameDescription,
         image: this.boardGameImage,
-        category: "Abstract",
+        category: this.selectedCategory,
         rating: 0,
       });
       this.closeModal();
@@ -92,6 +123,10 @@ export default {
         this.boardGameImage = reader.result;
         console.log(reader.result);
       };
+    },
+    updateSelectedCategory(newCategory) {
+      console.log(newCategory);
+      this.selectedCategory = newCategory;
     },
   },
 };

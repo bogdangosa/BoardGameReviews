@@ -1,7 +1,7 @@
 <template>
   <div class="bg-neutral1 p-2 rounded-lg w-fit">
     <select class="outline-none" v-model="selectedOption">
-      <option value="" disabled selected>Select an option</option>
+      <option value="" disabled selected>{{ title }}</option>
       <option v-for="option in options" :value="option">
         {{ option }}
       </option>
@@ -12,6 +12,7 @@
 <script lang="ts" setup>
 const props = defineProps<{
   options: string[];
+  title: string;
 }>();
 
 const emit = defineEmits<{

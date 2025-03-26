@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="game-page">
     <div class="hero-game flex justify-center">
       <img class="cover-image" :src="`/azul_duel_cover.jpg`" />
       <div class="container p-4 sm:p-8 gap-4 flex flex-col items-start">
@@ -35,7 +35,10 @@
         </div>
         <div class="rating-container flex gap-2 justify-center items-center">
           <p class="c-background1">my rating:</p>
-          <StarsRating :rating="8" />
+          <StarsRating
+            :rating="thisBoardgame.myRating ? thisBoardgame.myRating : 0"
+            @updateRating="updateRating"
+          />
         </div>
       </div>
     </div>
@@ -60,6 +63,12 @@
       @close="isDeleteModalOpened = false"
       @deleteBoardgame="deleteBoardgame"
     />
+    <ModalEditBoardGame
+      :boardgame="thisBoardgame"
+      v-if="isEditModalOpened"
+      @close="isEditModalOpened = false"
+      @editBoardgame="editBoardgame"
+    />
   </div>
 </template>
 
@@ -71,6 +80,7 @@ interface Boardgame {
   image: string;
   category: string;
   rating: number;
+  myRating: number;
 }
 
 const isDeleteModalOpened = ref(false);
@@ -79,11 +89,12 @@ const route = useRoute();
 
 const thisBoardgame = ref({
   id: 0,
-  title: "aaa",
-  description: "bbb",
+  title: "",
+  description: "",
   image: "",
   category: "",
   rating: 0,
+  myRating: 0,
 });
 
 const injectedData = inject<{
@@ -96,20 +107,48 @@ if (!injectedData) {
 }
 
 const { boardgamesData, updateBoardgamesData } = injectedData;
+
 const boardgameId = Number(route.params.id);
+
 const thisBoardgameValue = boardgamesData.value.find(
   (boardgame: any) => boardgame.id === boardgameId
 );
 if (thisBoardgameValue) {
   thisBoardgame.value = thisBoardgameValue;
 }
-console.log(boardgamesData);
+
 function deleteBoardgame() {
   const newBoardgamesData = boardgamesData.value.filter(
     (boardgame: any) => boardgame.id !== boardgameId
   );
   updateBoardgamesData(newBoardgamesData);
   navigateTo("/");
+}
+function editBoardgame(newBoardgame: any) {
+  const newBoardgamesData = boardgamesData.value.map((boardgame: any) => {
+    if (boardgame.id === boardgameId) {
+      thisBoardgame.value = { ...boardgame, ...newBoardgame };
+      return { ...boardgame, ...newBoardgame };
+    }
+    return boardgame;
+  });
+  updateBoardgamesData(newBoardgamesData);
+  isEditModalOpened.value = false;
+}
+
+function updateRating(rating: number) {
+  console.log(rating);
+  const newBoardgamesData = boardgamesData.value.map((boardgame: any) => {
+    if (boardgame.id === boardgameId) {
+      console.log("here");
+      thisBoardgame.value.myRating = rating;
+      return { ...boardgame, myRating: rating };
+    }
+    return boardgame;
+  });
+  console.log(newBoardgamesData);
+  console.log(thisBoardgame.value);
+  updateBoardgamesData(newBoardgamesData);
 }
 </script>
 

@@ -13,5 +13,5 @@ export default defineNuxtConfig({
       "Noto Sans": [300, 400, 600, 700],
     },
   },
-  modules: ["@nuxtjs/google-fonts"],
+  modules: ["@nuxtjs/google-fonts", "@nuxt/test-utils/module"],
 });

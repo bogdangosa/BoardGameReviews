@@ -1,7 +1,17 @@
 <template>
   <div class="stars-rating flex gap-1">
-    <img :src="`/star-filled.svg`" v-for="star in filledStars" />
-    <img :src="`/star-empty.svg`" v-for="star in emptyStars" />
+    <img
+      class="star"
+      :src="`/star-filled.svg`"
+      v-for="star in filledStars"
+      @click="updateRating(star)"
+    />
+    <img
+      class="star"
+      :src="`/star-empty.svg`"
+      v-for="star in emptyStars"
+      @click="updateRating(star)"
+    />
   </div>
 </template>
 
@@ -9,6 +19,18 @@
 const props = defineProps<{ rating: number }>();
 const filledStars = Array.from({ length: props.rating }, (_, i) => i + 1);
 const emptyStars = Array.from({ length: 10 - props.rating }, (_, i) => i + 1);
+
+const emit = defineEmits(["updateRating"]);
+
+function updateRating(rating: number) {
+  console.log("stars-rating", rating);
+
+  emit("updateRating", rating);
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+.star {
+  cursor: pointer;
+}
+</style>
