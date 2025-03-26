@@ -67,6 +67,15 @@ const boardgamesData = ref([
     rating: 3.0,
     category: "Family",
   },
+  {
+    id: 8,
+    title: "Codenames",
+    description:
+      "Give your team clever one-word clues to help them spot their agents in the field.",
+    image: "/codenames.jpg",
+    rating: 7.5,
+    category: "Party",
+  },
 ]);
 
 provide("boardgamesData", {

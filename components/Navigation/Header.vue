@@ -7,6 +7,7 @@
       <nav class="hidden md:block">
         <ul>
           <li class=""><NuxtLink class="nav-link" to="/">Browse</NuxtLink></li>
+          <li><NuxtLink class="nav-link" to="/stats">Stats</NuxtLink></li>
           <li><NuxtLink class="nav-link" to="/account">Account</NuxtLink></li>
         </ul>
       </nav>
