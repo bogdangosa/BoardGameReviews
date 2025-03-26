@@ -57,7 +57,6 @@ export default {
   props: {
     boardgame: {
       type: Object,
-      required: true,
     },
   },
   setup(props) {

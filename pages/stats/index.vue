@@ -32,17 +32,35 @@ const { boardgamesData, updateBoardgamesData } = inject<{
 
 const categories = ["Abstract", "Strategy", "Party", "Family", "Cooperative"];
 
-const charts = ["Nr of games in category", "Average rating by category"];
+const charts = [
+  "Nr of games in category",
+  "Average rating by category",
+  "My rating by category",
+];
 const selectedChart = ref("Nr of games in category");
 function updateSelectedChart(selectedChartInDropdown: string) {
   console.log(selectedChartInDropdown);
   selectedChart.value = selectedChartInDropdown;
 }
 
-const nrOfGamesInCategory = categories.map(
-  (category) =>
-    boardgamesData.value.filter((game) => game.category === category).length
+const nrOfGamesInCategory = computed(() =>
+  categories.map(
+    (category) =>
+      boardgamesData.value.filter((game) => game.category === category).length
+  )
 );
+const myRatingByCategory = categories.map((category) => {
+  const gamesInCategory = boardgamesData.value.filter(
+    (game) => game.category === category
+  );
+  const totalRating = gamesInCategory.reduce(
+    (acc, game) => acc + (game.myRating ? game.myRating : 0),
+    0
+  );
+  return totalRating / gamesInCategory.length;
+});
+
+console.log(nrOfGamesInCategory);
 
 const averageRatingByCategory = categories.map((category) => {
   const gamesInCategory = boardgamesData.value.filter(
@@ -80,7 +98,9 @@ ChartJS.register(
 
 const chartDataSet = computed(() => {
   if (selectedChart.value == "Nr of games in category")
-    return nrOfGamesInCategory;
+    return nrOfGamesInCategory.value;
+  else if (selectedChart.value == "My rating by category")
+    return myRatingByCategory;
   else return averageRatingByCategory;
 });
 

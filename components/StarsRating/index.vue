@@ -10,15 +10,19 @@
       class="star"
       :src="`/star-empty.svg`"
       v-for="star in emptyStars"
-      @click="updateRating(star)"
+      @click="updateRating(star + filledStars.length)"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
 const props = defineProps<{ rating: number }>();
-const filledStars = Array.from({ length: props.rating }, (_, i) => i + 1);
-const emptyStars = Array.from({ length: 10 - props.rating }, (_, i) => i + 1);
+const filledStars = computed(() =>
+  Array.from({ length: props.rating }, (_, i) => i + 1)
+);
+const emptyStars = computed(() =>
+  Array.from({ length: 10 - props.rating }, (_, i) => i + 1)
+);
 
 const emit = defineEmits(["updateRating"]);
 

@@ -6,16 +6,16 @@
         <div class="flex flex-col md:flex-row gap-8 h-full">
           <img
             class="game-image"
-            :src="thisBoardgame.image"
+            :src="thisBoardgameValue?.image"
             alt="Boardgame cover"
           />
           <div class="text-container">
             <div class="score-container flex justify-center items-center">
-              <span class="score">{{ thisBoardgame.rating }} </span>
+              <span class="score">{{ thisBoardgameValue?.rating }} </span>
             </div>
             <div class="flex gap-4">
               <h2 class="c-background1 bold">
-                {{ thisBoardgame.id + ". " + thisBoardgame.title }}
+                {{ thisBoardgameValue?.id + ". " + thisBoardgameValue?.title }}
               </h2>
               <img
                 class="button"
@@ -30,13 +30,15 @@
                 alt=""
               />
             </div>
-            <p class="c-background1">{{ thisBoardgame.description }}</p>
+            <p class="c-background1">{{ thisBoardgameValue?.description }}</p>
           </div>
         </div>
         <div class="rating-container flex gap-2 justify-center items-center">
           <p class="c-background1">my rating:</p>
           <StarsRating
-            :rating="thisBoardgame.myRating ? thisBoardgame.myRating : 0"
+            :rating="
+              thisBoardgameValue?.myRating ? thisBoardgameValue?.myRating : 0
+            "
             @updateRating="updateRating"
           />
         </div>
@@ -64,7 +66,7 @@
       @deleteBoardgame="deleteBoardgame"
     />
     <ModalEditBoardGame
-      :boardgame="thisBoardgame"
+      :boardgame="thisBoardgameValue"
       v-if="isEditModalOpened"
       @close="isEditModalOpened = false"
       @editBoardgame="editBoardgame"
@@ -87,35 +89,23 @@ const isDeleteModalOpened = ref(false);
 const isEditModalOpened = ref(false);
 const route = useRoute();
 
-const thisBoardgame = ref({
-  id: 0,
-  title: "",
-  description: "",
-  image: "",
-  category: "",
-  rating: 0,
-  myRating: 0,
-});
-
-const injectedData = inject<{
+const { boardgamesData, updateBoardgamesData } = inject<{
   boardgamesData: Ref<Boardgame[]>;
   updateBoardgamesData: (newData: any) => void;
-}>("boardgamesData");
-
-if (!injectedData) {
-  throw new Error("boardgamesData is not provided");
-}
-
-const { boardgamesData, updateBoardgamesData } = injectedData;
+}>("boardgamesData", {
+  boardgamesData: ref([]),
+  updateBoardgamesData: (newData: any) => {},
+});
 
 const boardgameId = Number(route.params.id);
 
-const thisBoardgameValue = boardgamesData.value.find(
-  (boardgame: any) => boardgame.id === boardgameId
-);
-if (thisBoardgameValue) {
-  thisBoardgame.value = thisBoardgameValue;
-}
+const thisBoardgameValue = computed(() => {
+  const found = boardgamesData.value.find(
+    (boardgame: any) => boardgame.id === boardgameId
+  );
+  console.log("Computed value updated:", found);
+  return found;
+});
 
 function deleteBoardgame() {
   const newBoardgamesData = boardgamesData.value.filter(
@@ -126,12 +116,17 @@ function deleteBoardgame() {
 }
 function editBoardgame(newBoardgame: any) {
   const newBoardgamesData = boardgamesData.value.map((boardgame: any) => {
+    console.log("Edit boardgame:", boardgame);
+
     if (boardgame.id === boardgameId) {
-      thisBoardgame.value = { ...boardgame, ...newBoardgame };
+      console.log("no match");
       return { ...boardgame, ...newBoardgame };
     }
+
     return boardgame;
   });
+  console.log(newBoardgamesData);
+
   updateBoardgamesData(newBoardgamesData);
   isEditModalOpened.value = false;
 }
@@ -139,15 +134,12 @@ function editBoardgame(newBoardgame: any) {
 function updateRating(rating: number) {
   console.log(rating);
   const newBoardgamesData = boardgamesData.value.map((boardgame: any) => {
-    if (boardgame.id === boardgameId) {
-      console.log("here");
-      thisBoardgame.value.myRating = rating;
+    if (boardgame?.id === boardgameId) {
       return { ...boardgame, myRating: rating };
     }
     return boardgame;
   });
   console.log(newBoardgamesData);
-  console.log(thisBoardgame.value);
   updateBoardgamesData(newBoardgamesData);
 }
 </script>

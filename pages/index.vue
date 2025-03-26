@@ -31,9 +31,6 @@
             :options="categories"
             v-on:update:selectedOption="updateSelectedCategory"
           />
-          <Button data-test="add-boardgame-button" @click="isModalOpened = true"
-            >Add your own</Button
-          >
         </div>
       </div>
     </div>
@@ -53,12 +50,6 @@
           </NuxtLink>
         </div>
       </div>
-      <ModalAddBoardGame
-        v-if="isModalOpened"
-        @close="isModalOpened = false"
-        @addBoardgame="addBoardgame"
-        @click=""
-      />
     </div>
   </main>
 </template>
@@ -140,25 +131,6 @@ const displayedBoardgames = computed(() => {
       pagination.currentPage * pagination.itemsPerPage
     );
 });
-
-const isModalOpened = ref(false);
-
-function addBoardgame(newBoardgame: IBoardgame) {
-  console.log(newBoardgame);
-  console.log("Adding boardgame");
-  updateBoardgamesData([
-    ...boardgamesData.value,
-    {
-      id: boardgamesData.value.length + 1,
-      title: newBoardgame.title,
-      description: newBoardgame.description,
-      image: newBoardgame.image,
-      category: newBoardgame.category,
-      rating: newBoardgame.rating,
-    },
-  ]);
-}
-defineExpose({ addBoardgame });
 </script>
 
 <style>

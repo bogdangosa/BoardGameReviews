@@ -1,7 +1,15 @@
 <template>
   <div>
-    <NavigationHeader></NavigationHeader>
+    <NavigationHeader
+      @openAddBoardgameModal="isModalOpened = true"
+    ></NavigationHeader>
     <slot />
+    <ModalAddBoardGame
+      v-if="isModalOpened"
+      @close="isModalOpened = false"
+      @addBoardgame="addBoardgame"
+      @click=""
+    />
   </div>
 </template>
 
@@ -84,6 +92,24 @@ provide("boardgamesData", {
     boardgamesData.value = newData;
   },
 });
+
+const isModalOpened = ref(false);
+
+function addBoardgame(newBoardgame: IBoardgame) {
+  console.log("Adding boardgame");
+  boardgamesData.value = [
+    ...boardgamesData.value,
+    {
+      id: boardgamesData.value.length + 1,
+      title: newBoardgame.title,
+      description: newBoardgame.description,
+      image: newBoardgame.image,
+      category: newBoardgame.category,
+      rating: newBoardgame.rating,
+    },
+  ];
+}
+defineExpose({ addBoardgame });
 </script>
 
 <style></style>

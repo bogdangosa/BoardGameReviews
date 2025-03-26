@@ -1,7 +1,7 @@
 <template>
   <header class="header flex justify-center">
     <div
-      class="header-container container flex justify-between align-middle p-8"
+      class="header-container container flex justify-between align-middle p-6"
     >
       <NuxtLink to="/"><h1 class="logo bold">BG Reviews</h1></NuxtLink>
       <nav class="hidden md:block">
@@ -9,6 +9,11 @@
           <li class=""><NuxtLink class="nav-link" to="/">Browse</NuxtLink></li>
           <li><NuxtLink class="nav-link" to="/stats">Stats</NuxtLink></li>
           <li><NuxtLink class="nav-link" to="/account">Account</NuxtLink></li>
+          <Button
+            data-test="add-boardgame-button"
+            @click="openAddBoardgameModal"
+            >Add your own</Button
+          >
         </ul>
       </nav>
     </div>
@@ -18,22 +23,26 @@
 <script>
 export default {
   name: "Header",
+  methods: {
+    openAddBoardgameModal() {
+      this.$emit("openAddBoardgameModal");
+    },
+  },
 };
 </script>
 
 <style scoped>
 .logo {
   position: relative;
-  top: -4px;
   font-size: 1.5rem;
   color: var(--background-color-1);
 }
 .header {
-  height: 6rem;
   background-color: var(--accent-color-1);
 }
 .header nav ul {
   display: flex;
+  align-items: center;
   gap: 1rem;
   flex-direction: row;
 }
