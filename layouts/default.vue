@@ -18,11 +18,11 @@ const boardgamesData = ref([
   },
   {
     id: 2,
-    title: "Calico",
-    description: "Sew a quilt, collect buttons, attract cats!",
-    image: "/calico.jpg",
-    rating: 7.5,
-    category: "Abstract",
+    title: "Lost Ruins of Arnak",
+    description: "Explore an island, discover artifacts, and defeat guardians.",
+    image: "/lost_ruins_of_arnak.jpg",
+    rating: 8.0,
+    category: "Strategy",
   },
   {
     id: 3,
@@ -34,11 +34,11 @@ const boardgamesData = ref([
   },
   {
     id: 4,
-    title: "Lost Ruins of Arnak",
-    description: "Explore an island, discover artifacts, and defeat guardians.",
-    image: "/lost_ruins_of_arnak.jpg",
-    rating: 8.0,
-    category: "Strategy",
+    title: "Calico",
+    description: "Sew a quilt, collect buttons, attract cats!",
+    image: "/calico.jpg",
+    rating: 7.5,
+    category: "Abstract",
   },
   {
     id: 5,
@@ -57,6 +57,15 @@ const boardgamesData = ref([
     image: "/the_crew.jpg",
     rating: 8.0,
     category: "Cooperative",
+  },
+  {
+    id: 7,
+    title: "Monopoly",
+    description:
+      "In this competitive real estate market, there's only one possible outcome: Monopoly! ",
+    image: "/monopoly.jpg",
+    rating: 3.0,
+    category: "Family",
   },
 ]);
 

@@ -16,7 +16,11 @@
   --background-color-1: #f6f6f6;
   --background-color-2: #eeeeee;
   --red: #d22b2b;
+  --yellow: #b9bc03;
   --green: #2ed22e;
+  --rating-1-to-5: var(--red);
+  --rating-5-to-8: var(--yellow);
+  --rating-8-to-10: #037b0d;
   font-family: "Noto Sans", sans-serif;
 }
 .bold {
@@ -44,7 +48,7 @@
 .bg-neutral3 {
   background-color: var(--text-color-3);
 }
-bg-background1 {
+.bg-background1 {
   background-color: var(--background-color-1);
 }
 .bg-background2 {

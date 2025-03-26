@@ -1,5 +1,5 @@
 <template>
-  <button :class="'my-button bg-' + color">
+  <button :class="'my-button bg-' + colorBackground + ' c-' + color">
     <slot></slot>
   </button>
 </template>
@@ -10,6 +10,10 @@ export default {
   props: {
     color: {
       type: String,
+      default: "background1",
+    },
+    colorBackground: {
+      type: String,
       default: "accent2",
     },
   },
@@ -19,7 +23,6 @@ export default {
 <style scoped>
 button {
   padding: 8px 24px;
-  color: white;
   border: none;
   height: fit-content;
   border-radius: 5px;

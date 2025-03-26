@@ -7,6 +7,20 @@
       >
         <h2 class="home-page-hero-title">All Boardgames</h2>
         <div class="flex gap-2">
+          <Button
+            data-test="prev-button"
+            colorBackground="background1"
+            color="text1"
+            @click="prevPage"
+            >Prev</Button
+          >
+          <Button
+            data-test="next-button"
+            colorBackground="background1"
+            color="text1"
+            @click="nextPage"
+            >Next</Button
+          >
           <Dropdown
             title="Sort by"
             :options="sortings"
@@ -33,6 +47,7 @@
             <CardBoardGame
               :image="boardgame.image"
               :title="boardgame.title"
+              :rating="boardgame.rating"
               :description="boardgame.description"
             />
           </NuxtLink>
@@ -68,6 +83,11 @@ const categories = [
   "Cooperative",
 ];
 
+const pagination = reactive({
+  currentPage: 1,
+  itemsPerPage: 4,
+});
+
 const sortings = ["Default", "Alphabetically", "Rating"];
 
 const selectedCategory = ref("All");
@@ -81,6 +101,23 @@ function updateSelectedCategory(newCategory: string) {
 function updateSelectedSorting(newSorting: string) {
   console.log(newSorting);
   selectedSorting.value = newSorting;
+}
+
+function nextPage() {
+  if (
+    pagination.currentPage * pagination.itemsPerPage >=
+    boardgamesData.value.length
+  ) {
+    return;
+  }
+  pagination.currentPage++;
+}
+
+function prevPage() {
+  if (pagination.currentPage === 1) {
+    return;
+  }
+  pagination.currentPage--;
 }
 
 const { boardgamesData, updateBoardgamesData } = inject<{
@@ -107,7 +144,11 @@ const displayedBoardgames = computed(() => {
         return b.rating - a.rating;
       }
       return 0;
-    });
+    })
+    .slice(
+      (pagination.currentPage - 1) * pagination.itemsPerPage,
+      pagination.currentPage * pagination.itemsPerPage
+    );
 });
 
 const isModalOpened = ref(false);
