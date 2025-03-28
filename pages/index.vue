@@ -85,6 +85,8 @@ function updateSelectedSorting(newSorting: string) {
 }
 
 function nextPage() {
+  console.log("nextPage");
+
   if (
     pagination.currentPage * pagination.itemsPerPage >=
     boardgamesData.value.length
@@ -105,8 +107,6 @@ const { boardgamesData, updateBoardgamesData } = inject<{
   boardgamesData: Ref<IBoardgame[]>;
   updateBoardgamesData: (newData: any) => void;
 }>("boardgamesData")!;
-
-console.log("here in testing", boardgamesData);
 
 const filterByCategory = (boardgame: IBoardgame, category: string) =>
   category === "All" || boardgame.category === selectedCategory.value;
@@ -131,6 +131,8 @@ const displayedBoardgames = computed(() => {
       pagination.currentPage * pagination.itemsPerPage
     );
 });
+
+defineExpose({ updateSelectedCategory, updateSelectedSorting });
 </script>
 
 <style>

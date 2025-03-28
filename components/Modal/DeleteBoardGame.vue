@@ -5,7 +5,12 @@
       <h2 class="mb-4">Are you sure you want to delete this?</h2>
       <div class="flex w-full justify-end gap-2">
         <Button color="neutral3" @click="closeModal">Cancel</Button>
-        <Button color="red" @click="deleteBoardGame">Delete</Button>
+        <Button
+          color="red"
+          @click="deleteBoardGame"
+          data-test="confirm-delete-button"
+          >Delete</Button
+        >
       </div>
     </div>
   </div>

@@ -19,12 +19,14 @@
               </h2>
               <img
                 class="button"
+                data-test="delete-button"
                 @click="isDeleteModalOpened = true"
                 :src="`/delete.svg`"
                 alt=""
               />
               <img
                 class="button"
+                data-test="edit-button"
                 @click="isEditModalOpened = true"
                 :src="`/edit.svg`"
                 alt=""
@@ -142,6 +144,12 @@ function updateRating(rating: number) {
   console.log(newBoardgamesData);
   updateBoardgamesData(newBoardgamesData);
 }
+
+defineExpose({
+  deleteBoardgame,
+  editBoardgame,
+  updateRating,
+});
 </script>
 
 <style>

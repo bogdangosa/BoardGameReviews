@@ -109,7 +109,11 @@ function addBoardgame(newBoardgame: IBoardgame) {
     },
   ];
 }
-defineExpose({ addBoardgame });
+function getBoardGames() {
+  return boardgamesData.value;
+}
+
+defineExpose({ addBoardgame, getBoardGames });
 </script>
 
 <style></style>
