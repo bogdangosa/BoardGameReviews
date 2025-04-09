@@ -14,4 +14,9 @@ export default defineNuxtConfig({
     },
   },
   modules: ["@nuxtjs/google-fonts", "@nuxt/test-utils/module"],
+  runtimeConfig: {
+    public: {
+      serverAdress: process.env.SERVER_ADRESS,
+    },
+  },
 });

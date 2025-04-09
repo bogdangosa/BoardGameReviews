@@ -43,35 +43,48 @@ function updateSelectedChart(selectedChartInDropdown: string) {
   selectedChart.value = selectedChartInDropdown;
 }
 
-const nrOfGamesInCategory = computed(() =>
+const getNrOfGamesInCategory = () =>
   categories.map(
     (category) =>
       boardgamesData.value.filter((game) => game.category === category).length
-  )
-);
-const myRatingByCategory = categories.map((category) => {
-  const gamesInCategory = boardgamesData.value.filter(
-    (game) => game.category === category
   );
-  const totalRating = gamesInCategory.reduce(
-    (acc, game) => acc + (game.myRating ? game.myRating : 0),
-    0
-  );
-  return totalRating / gamesInCategory.length;
-});
 
-console.log(nrOfGamesInCategory);
+const getMyRatingByCategory = () =>
+  categories.map((category) => {
+    const gamesInCategory = boardgamesData.value.filter(
+      (game) => game.category === category
+    );
+    const ratedgames = gamesInCategory.filter(
+      (game) => game.myRating !== undefined
+    );
+    if (ratedgames.length === 0) {
+      return 0;
+    }
+    const totalRating = ratedgames.reduce((acc, game) => {
+      return acc + (game.myRating ? game.myRating : 0);
+    }, 0);
+    return totalRating / ratedgames.length;
+  });
 
-const averageRatingByCategory = categories.map((category) => {
-  const gamesInCategory = boardgamesData.value.filter(
-    (game) => game.category === category
-  );
-  const totalRating = gamesInCategory.reduce(
-    (acc, game) => acc + game.rating,
-    0
-  );
-  return totalRating / gamesInCategory.length;
-});
+const getAverageRatingByCategory = () =>
+  categories.map((category) => {
+    const gamesInCategory = boardgamesData.value.filter(
+      (game) => game.category === category
+    );
+    const totalRating = gamesInCategory.reduce(
+      (acc, game) => acc + game.rating,
+      0
+    );
+    return totalRating / gamesInCategory.length
+      ? totalRating / gamesInCategory.length
+      : 0;
+  });
+
+const nrOfGamesInCategory = computed(getNrOfGamesInCategory);
+
+const myRatingByCategory = computed(getMyRatingByCategory);
+
+const averageRatingByCategory = computed(getAverageRatingByCategory);
 
 console.log(nrOfGamesInCategory);
 
@@ -100,8 +113,8 @@ const chartDataSet = computed(() => {
   if (selectedChart.value == "Nr of games in category")
     return nrOfGamesInCategory.value;
   else if (selectedChart.value == "My rating by category")
-    return myRatingByCategory;
-  else return averageRatingByCategory;
+    return myRatingByCategory.value;
+  else return averageRatingByCategory.value;
 });
 
 const chartData = computed(() => ({
@@ -118,6 +131,12 @@ const chartData = computed(() => ({
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
+});
+
+defineExpose({
+  getAverageRatingByCategory,
+  getMyRatingByCategory,
+  getNrOfGamesInCategory,
 });
 </script>
 

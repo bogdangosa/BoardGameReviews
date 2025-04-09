@@ -77,6 +77,8 @@
 </template>
 
 <script lang="ts" setup>
+import axios from "axios";
+
 interface Boardgame {
   id: number;
   title: string;
@@ -91,59 +93,96 @@ const isDeleteModalOpened = ref(false);
 const isEditModalOpened = ref(false);
 const route = useRoute();
 
-const { boardgamesData, updateBoardgamesData } = inject<{
-  boardgamesData: Ref<Boardgame[]>;
-  updateBoardgamesData: (newData: any) => void;
-}>("boardgamesData", {
-  boardgamesData: ref([]),
-  updateBoardgamesData: (newData: any) => {},
-});
-
 const boardgameId = Number(route.params.id);
 
-const thisBoardgameValue = computed(() => {
-  const found = boardgamesData.value.find(
-    (boardgame: any) => boardgame.id === boardgameId
-  );
-  console.log("Computed value updated:", found);
-  return found;
+const thisBoardgameValue = ref<Boardgame>({
+  id: boardgameId,
+  title: "test",
+  description: "test",
+  image: "test",
+  category: "",
+  rating: 0,
+  myRating: 0,
 });
 
-function deleteBoardgame() {
-  const newBoardgamesData = boardgamesData.value.filter(
-    (boardgame: any) => boardgame.id !== boardgameId
+const getBoardgameData = async () => {
+  const responseBoardgame = await getBoardgameDataAsync(boardgameId);
+  if (responseBoardgame) {
+    thisBoardgameValue.value = {
+      id: responseBoardgame.boardgameId,
+      title: responseBoardgame.title,
+      description: responseBoardgame.description,
+      image: "/catan.jpg",
+      category: responseBoardgame.category,
+      rating: responseBoardgame.rating,
+      myRating: 0,
+    };
+  } else {
+    console.log("No boardgame found");
+  }
+};
+
+getBoardgameData();
+
+async function getBoardgameDataAsync(boardgameId: number) {
+  const config = useRuntimeConfig();
+  const serverAdress = config.public.serverAdress;
+  console.log(serverAdress);
+
+  const response = await axios.get(
+    serverAdress + "/Boardgame/get-one?boardgameId=" + boardgameId
   );
-  updateBoardgamesData(newBoardgamesData);
-  navigateTo("/");
+  console.log(response.data);
+  if (response.data.length === 0) {
+    return null;
+  }
+
+  return response.data;
 }
+
+function deleteBoardgame() {
+  const config = useRuntimeConfig();
+  const serverAdress = config.public.serverAdress;
+  console.log(serverAdress);
+
+  axios
+    .delete(serverAdress + "/Boardgame/delete?boardgameId=" + boardgameId)
+    .then(() => {
+      console.log("Boardgame deleted");
+      navigateTo("/");
+    })
+    .catch((error) => {
+      console.error("Error deleting boardgame:", error);
+    });
+}
+
 function editBoardgame(newBoardgame: any) {
-  const newBoardgamesData = boardgamesData.value.map((boardgame: any) => {
-    console.log("Edit boardgame:", boardgame);
+  const config = useRuntimeConfig();
+  const serverAdress = config.public.serverAdress;
+  console.log(serverAdress);
 
-    if (boardgame.id === boardgameId) {
-      console.log("no match");
-      return { ...boardgame, ...newBoardgame };
-    }
-
-    return boardgame;
-  });
-  console.log(newBoardgamesData);
-
-  updateBoardgamesData(newBoardgamesData);
-  isEditModalOpened.value = false;
+  axios
+    .patch(serverAdress + "/Boardgame/update", {
+      boardgameId: boardgameId,
+      title: newBoardgame.title,
+      description: newBoardgame.description,
+      category: newBoardgame.category,
+      releaseDate: new Date(),
+      nrOfPlayers: 0,
+      playTime: 0,
+      weight: 0,
+      rating: thisBoardgameValue.value.rating,
+    })
+    .then(() => {
+      console.log("Boardgame udapted");
+      getBoardgameData();
+    })
+    .catch((error) => {
+      console.error("Error deleting boardgame:", error);
+    });
 }
 
-function updateRating(rating: number) {
-  console.log(rating);
-  const newBoardgamesData = boardgamesData.value.map((boardgame: any) => {
-    if (boardgame?.id === boardgameId) {
-      return { ...boardgame, myRating: rating };
-    }
-    return boardgame;
-  });
-  console.log(newBoardgamesData);
-  updateBoardgamesData(newBoardgamesData);
-}
+function updateRating(rating: number) {}
 
 defineExpose({
   deleteBoardgame,

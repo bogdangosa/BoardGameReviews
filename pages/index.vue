@@ -86,13 +86,6 @@ function updateSelectedSorting(newSorting: string) {
 
 function nextPage() {
   console.log("nextPage");
-
-  if (
-    pagination.currentPage * pagination.itemsPerPage >=
-    boardgamesData.value.length
-  ) {
-    return;
-  }
   pagination.currentPage++;
 }
 
@@ -103,34 +96,69 @@ function prevPage() {
   pagination.currentPage--;
 }
 
-const { boardgamesData, updateBoardgamesData } = inject<{
-  boardgamesData: Ref<IBoardgame[]>;
-  updateBoardgamesData: (newData: any) => void;
-}>("boardgamesData")!;
-
 const filterByCategory = (boardgame: IBoardgame, category: string) =>
   category === "All" || boardgame.category === selectedCategory.value;
 
-const displayedBoardgames = computed(() => {
-  return boardgamesData.value
-    .filter((boardgame) => filterByCategory(boardgame, selectedCategory.value))
-    .sort((a, b) => {
-      if (selectedSorting.value === "Default") {
-        return 0;
-      }
-      if (selectedSorting.value === "Alphabetically") {
-        return a.title.localeCompare(b.title);
-      }
-      if (selectedSorting.value === "Rating") {
-        return b.rating - a.rating;
-      }
-      return 0;
-    })
-    .slice(
-      (pagination.currentPage - 1) * pagination.itemsPerPage,
-      pagination.currentPage * pagination.itemsPerPage
-    );
+const displayedBoardgames = ref([] as IBoardgame[]);
+
+const getBoardGamesAsync = async (
+  page: number,
+  itemsPerPage: number,
+  category: string,
+  sorting: string
+) => {
+  const config = useRuntimeConfig();
+  const serverAdress = config.public.serverAdress;
+
+  const response = await $fetch(
+    serverAdress +
+      `/Boardgame/get-filtered?page=${page}&itemsPerPage=${itemsPerPage}&sortOrder=${sorting}&category=${category}`,
+    {
+      method: "GET",
+    }
+  );
+  console.log(response);
+  const result = (response as any).map((boardgame: any) => ({
+    id: boardgame.boardgameId,
+    title: boardgame.title,
+    description: boardgame.description,
+    image: "/catan.jpg",
+    rating: boardgame.rating,
+    category: boardgame.category,
+    myRating: null,
+  }));
+  return result;
+};
+
+const { $onBoardgameAdded } = useNuxtApp();
+
+$onBoardgameAdded(async () => {
+  console.log("boardgameAdded2");
+  displayedBoardgames.value = await getBoardGamesAsync(
+    pagination.currentPage,
+    pagination.itemsPerPage,
+    selectedCategory.value,
+    selectedSorting.value
+  );
 });
+
+watch(
+  () => [
+    pagination.currentPage,
+    pagination.itemsPerPage,
+    selectedCategory.value,
+    selectedSorting.value,
+  ],
+  async () => {
+    displayedBoardgames.value = await getBoardGamesAsync(
+      pagination.currentPage,
+      pagination.itemsPerPage,
+      selectedCategory.value,
+      selectedSorting.value
+    );
+  },
+  { immediate: true }
+);
 
 defineExpose({ updateSelectedCategory, updateSelectedSorting });
 </script>
