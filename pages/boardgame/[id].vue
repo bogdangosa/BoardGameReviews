@@ -112,7 +112,7 @@ const getBoardgameData = async () => {
       id: responseBoardgame.boardgameId,
       title: responseBoardgame.title,
       description: responseBoardgame.description,
-      image: "/catan.jpg",
+      image: responseBoardgame.image,
       category: responseBoardgame.category,
       rating: responseBoardgame.rating,
       myRating: 0,
@@ -136,7 +136,7 @@ async function getBoardgameDataAsync(boardgameId: number) {
   if (response.data.length === 0) {
     return null;
   }
-
+  response.data.image = serverAdress + "/resources/" + response.data.image;
   return response.data;
 }
 

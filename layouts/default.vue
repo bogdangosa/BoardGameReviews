@@ -2,6 +2,7 @@
   <div>
     <NavigationHeader
       @openAddBoardgameModal="isModalOpened = true"
+      :isServerDown="isServerDown"
     ></NavigationHeader>
     <slot />
     <ModalAddBoardGame
@@ -16,6 +17,7 @@
 <script lang="ts" setup>
 import axios from "axios";
 
+const { isServerDown } = useUseServerStatus();
 const boardgamesData = ref([] as IBoardgame[]);
 
 provide("boardgamesData", {
@@ -32,20 +34,30 @@ const isModalOpened = ref(false);
 async function getBoardgamesAsync() {
   const config = useRuntimeConfig();
   const serverAdress = config.public.serverAdress;
-
-  const response = await axios.get(serverAdress + "/Boardgame/get-all");
-  console.log(response.data);
-  const result = response.data.map((boardgame: any) => ({
-    id: boardgame.boardgameId,
-    title: boardgame.title,
-    description: boardgame.description,
-    image: "/catan.jpg",
-    rating: boardgame.rating,
-    category: boardgame.category,
-    myRating: null,
-  }));
-  console.log(result);
-  return result;
+  try {
+    const response = (await $fetch(serverAdress + "/Boardgame/get-all"),
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }) as any;
+    console.log(response);
+    const result = response.map((boardgame: any) => ({
+      id: boardgame.boardgameId,
+      title: boardgame.title,
+      description: boardgame.description,
+      image: "/catan.jpg",
+      rating: boardgame.rating,
+      category: boardgame.category,
+      myRating: null,
+    }));
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.log("Error fetching boardgames:", error);
+    return [];
+  }
 }
 
 const { $boardgameAdded } = useNuxtApp();
@@ -54,19 +66,24 @@ async function addBoardgame(newBoardgame: IBoardgame) {
   const config = useRuntimeConfig();
   const serverAdress = config.public.serverAdress;
 
-  const response = await axios.post(serverAdress + "/Boardgame/add", {
-    title: newBoardgame.title,
-    description: newBoardgame.description,
-    category: newBoardgame.category,
-    releaseDate: new Date(),
-    nrOfPlayers: 0,
-    playTime: 0,
-    weight: 0,
-    rating: 0,
-  });
-  console.log(response.data);
+  const formData = new FormData();
 
-  console.log(response.data);
+  formData.append("title", newBoardgame.title);
+  formData.append("description", newBoardgame.description);
+  formData.append("category", newBoardgame.category);
+  formData.append("releaseDate", new Date().toISOString());
+  formData.append("imageFile", newBoardgame.image);
+  formData.append("nrOfPlayers", "0");
+  formData.append("playTime", "0");
+  formData.append("weight", "0");
+  formData.append("rating", "0");
+
+  const response = await $fetch(serverAdress + "/Boardgame/add", {
+    method: "POST",
+    body: formData,
+  });
+
+  console.log(response);
   boardgamesData.value = await getBoardgamesAsync();
   $boardgameAdded();
   console.log("boardgameAdded1");

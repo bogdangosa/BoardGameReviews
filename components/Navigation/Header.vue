@@ -16,6 +16,9 @@
           >
         </ul>
       </nav>
+      <p v-if="isServerDown" class="server-down-message text-sm font-bold">
+        Server is down
+      </p>
     </div>
   </header>
 </template>
@@ -23,6 +26,12 @@
 <script>
 export default {
   name: "Header",
+  props: {
+    isServerDown: {
+      type: Boolean,
+      default: false,
+    },
+  },
   methods: {
     openAddBoardgameModal() {
       this.$emit("openAddBoardgameModal");
@@ -38,6 +47,7 @@ export default {
   color: var(--background-color-1);
 }
 .header {
+  position: relative;
   background-color: var(--accent-color-1);
 }
 .header nav ul {
@@ -50,5 +60,16 @@ export default {
   text-decoration: none;
   outline: none;
   color: var(--background-color-1);
+}
+.server-down-message {
+  position: absolute;
+  font-size: 0.8rem;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--yellow);
+  color: var(--background-color-1);
+  padding: 0.3rem 1rem;
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 </style>

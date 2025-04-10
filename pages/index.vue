@@ -7,7 +7,7 @@
       >
         <h2 class="home-page-hero-title">All Boardgames</h2>
         <div class="flex gap-2">
-          <Button
+          <!--<Button
             data-test="prev-button"
             colorBackground="background1"
             color="text1"
@@ -20,7 +20,7 @@
             color="text1"
             @click="nextPage"
             >Next</Button
-          >
+          >-->
           <Dropdown
             title="Sort by"
             :options="sortings"
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="content flex justify-center">
-      <div class="boardgames-table container p-8">
+      <div class="boardgames-table container p-8" ref="boardgamesTable">
         <div v-for="boardgame in displayedBoardgames">
           <NuxtLink
             :to="'/boardgame/' + boardgame.id"
@@ -63,10 +63,11 @@ const categories = [
   "Family",
   "Cooperative",
 ];
+const { isServerDown } = useUseServerStatus();
 
 const pagination = reactive({
   currentPage: 1,
-  itemsPerPage: 4,
+  itemsPerPage: 8,
 });
 
 const sortings = ["Default", "Alphabetically", "Rating"];
@@ -105,8 +106,32 @@ const getBoardGamesAsync = async (
   page: number,
   itemsPerPage: number,
   category: string,
-  sorting: string
+  sorting: string,
+  isServerDown: boolean
 ) => {
+  console.log(isServerDown);
+
+  if (isServerDown) {
+    console.log("Server is down, using local storage");
+    const { boardgames } = useUseBoardgamesFromLocalStorrage();
+    const filteredBoardgames = boardgames.value.filter(
+      (boardgame: IBoardgame) => filterByCategory(boardgame, category)
+    );
+    const sortedBoardgames = filteredBoardgames.sort((a, b) => {
+      if (sorting === "Alphabetically") {
+        return a.title.localeCompare(b.title);
+      } else if (sorting === "Rating") {
+        return b.rating - a.rating;
+      }
+      return 0;
+    });
+    const paginatedBoardgames = sortedBoardgames.slice(
+      (page - 1) * itemsPerPage,
+      page * itemsPerPage
+    );
+    return paginatedBoardgames;
+  }
+
   const config = useRuntimeConfig();
   const serverAdress = config.public.serverAdress;
 
@@ -122,7 +147,7 @@ const getBoardGamesAsync = async (
     id: boardgame.boardgameId,
     title: boardgame.title,
     description: boardgame.description,
-    image: "/catan.jpg",
+    image: serverAdress + "/resources/" + boardgame.image,
     rating: boardgame.rating,
     category: boardgame.category,
     myRating: null,
@@ -138,27 +163,63 @@ $onBoardgameAdded(async () => {
     pagination.currentPage,
     pagination.itemsPerPage,
     selectedCategory.value,
-    selectedSorting.value
+    selectedSorting.value,
+    isServerDown.value
   );
 });
 
 watch(
   () => [
-    pagination.currentPage,
-    pagination.itemsPerPage,
+    /* pagination.currentPage,
+    pagination.itemsPerPage,*/
     selectedCategory.value,
     selectedSorting.value,
+    isServerDown.value,
   ],
   async () => {
+    pagination.currentPage = 1;
+
     displayedBoardgames.value = await getBoardGamesAsync(
       pagination.currentPage,
       pagination.itemsPerPage,
       selectedCategory.value,
-      selectedSorting.value
+      selectedSorting.value,
+      isServerDown.value
     );
   },
   { immediate: true }
 );
+
+const loadMoreBoardgames = async () => {
+  pagination.currentPage++;
+  const newBoardgames = await getBoardGamesAsync(
+    pagination.currentPage,
+    pagination.itemsPerPage,
+    selectedCategory.value,
+    selectedSorting.value,
+    isServerDown.value
+  );
+  displayedBoardgames.value.push(...newBoardgames);
+  console.log("Loaded more boardgames:", newBoardgames);
+  console.log("All boardgames:", displayedBoardgames.value);
+};
+
+const boardgamesTable = ref<HTMLElement | null>(null);
+
+const handleScroll = (e: Event) => {
+  const element = boardgamesTable.value;
+  if (element && element.getBoundingClientRect().bottom < window.innerHeight) {
+    loadMoreBoardgames();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 
 defineExpose({ updateSelectedCategory, updateSelectedSorting });
 </script>

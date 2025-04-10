@@ -116,13 +116,7 @@ export default {
     },
     previewFiles(event) {
       console.log(event.target.files);
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.boardGameImage = reader.result;
-        console.log(reader.result);
-      };
+      this.boardGameImage  = event.target.files[0];
     },
     updateSelectedCategory(newCategory) {
       console.log(newCategory);
