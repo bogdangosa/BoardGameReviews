@@ -1,5 +1,6 @@
 export const useUseServerStatus = () => {
-  const isServerDown = ref(false);
+  const isServerDown = ref(true);
+  const { executeCommands } = useBoardgameCommandsLocalStorrage();
 
   async function checkServer() {
     try {
@@ -7,12 +8,12 @@ export const useUseServerStatus = () => {
       const serverAdress = config.public.serverAdress;
       const result = await $fetch(serverAdress + "/Boardgame/get-all");
       localStorage.setItem("boardgameList", JSON.stringify(result));
+      if (isServerDown) executeCommands();
       isServerDown.value = false;
     } catch {
       isServerDown.value = true;
     }
   }
-
   setInterval(checkServer, 5000); // ping every 5s
   checkServer(); // initial check
   return {

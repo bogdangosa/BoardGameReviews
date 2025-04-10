@@ -38,8 +38,8 @@
       <div class="boardgames-table container p-8" ref="boardgamesTable">
         <div v-for="boardgame in displayedBoardgames">
           <NuxtLink
-            :to="'/boardgame/' + boardgame.id"
-            :data-test="'boardgame-link-' + boardgame.id"
+            :to="'/boardgame/' + boardgame.boardgameId"
+            :data-test="'boardgame-link-' + boardgame.boardgameId"
           >
             <CardBoardGame
               :image="boardgame.image"
@@ -63,7 +63,7 @@ const categories = [
   "Family",
   "Cooperative",
 ];
-const { isServerDown } = useUseServerStatus();
+const { isServerDown } = await useUseServerStatus();
 
 const pagination = reactive({
   currentPage: 1,
@@ -114,6 +114,7 @@ const getBoardGamesAsync = async (
   if (isServerDown) {
     console.log("Server is down, using local storage");
     const { boardgames } = useUseBoardgamesFromLocalStorrage();
+    console.log(boardgames.value);
     const filteredBoardgames = boardgames.value.filter(
       (boardgame: IBoardgame) => filterByCategory(boardgame, category)
     );
@@ -144,7 +145,7 @@ const getBoardGamesAsync = async (
   );
   console.log(response);
   const result = (response as any).map((boardgame: any) => ({
-    id: boardgame.boardgameId,
+    boardgameId: boardgame.boardgameId,
     title: boardgame.title,
     description: boardgame.description,
     image: serverAdress + "/resources/" + boardgame.image,
@@ -158,6 +159,7 @@ const getBoardGamesAsync = async (
 const { $onBoardgameAdded } = useNuxtApp();
 
 $onBoardgameAdded(async () => {
+  pagination.currentPage = 1;
   console.log("boardgameAdded2");
   displayedBoardgames.value = await getBoardGamesAsync(
     pagination.currentPage,

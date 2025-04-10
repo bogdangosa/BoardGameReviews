@@ -15,7 +15,11 @@
             </div>
             <div class="flex gap-4">
               <h2 class="c-background1 bold">
-                {{ thisBoardgameValue?.id + ". " + thisBoardgameValue?.title }}
+                {{
+                  thisBoardgameValue?.boardgameId +
+                  ". " +
+                  thisBoardgameValue?.title
+                }}
               </h2>
               <img
                 class="button"
@@ -80,7 +84,7 @@
 import axios from "axios";
 
 interface Boardgame {
-  id: number;
+  boardgameId: number;
   title: string;
   description: string;
   image: string;
@@ -96,7 +100,7 @@ const route = useRoute();
 const boardgameId = Number(route.params.id);
 
 const thisBoardgameValue = ref<Boardgame>({
-  id: boardgameId,
+  boardgameId: boardgameId,
   title: "test",
   description: "test",
   image: "test",
@@ -104,24 +108,53 @@ const thisBoardgameValue = ref<Boardgame>({
   rating: 0,
   myRating: 0,
 });
+const { isServerDown } = await useUseServerStatus();
+const { addCommandToLocalStorage } = useBoardgameCommandsLocalStorrage();
 
 const getBoardgameData = async () => {
-  const responseBoardgame = await getBoardgameDataAsync(boardgameId);
-  if (responseBoardgame) {
-    thisBoardgameValue.value = {
-      id: responseBoardgame.boardgameId,
-      title: responseBoardgame.title,
-      description: responseBoardgame.description,
-      image: responseBoardgame.image,
-      category: responseBoardgame.category,
-      rating: responseBoardgame.rating,
-      myRating: 0,
-    };
-  } else {
-    console.log("No boardgame found");
+  console.log("Server is up");
+  try {
+    const responseBoardgame = await getBoardgameDataAsync(boardgameId);
+    if (responseBoardgame) {
+      thisBoardgameValue.value = {
+        boardgameId: responseBoardgame.boardgameId,
+        title: responseBoardgame.title,
+        description: responseBoardgame.description,
+        image: responseBoardgame.image,
+        category: responseBoardgame.category,
+        rating: responseBoardgame.rating,
+        myRating: 0,
+      };
+    } else {
+      console.log("No boardgame found");
+    }
+  } catch (error) {
+    console.error("Error fetching boardgame data:", error);
+    console.log("Server is down");
+    const { boardgames } = useUseBoardgamesFromLocalStorrage();
+    const boardgame = boardgames.value.find(
+      (boardgame) => boardgame.boardgameId === boardgameId
+    );
+    if (boardgame) {
+      thisBoardgameValue.value = {
+        boardgameId: boardgame.boardgameId,
+        title: boardgame.title,
+        description: boardgame.description,
+        image: boardgame.image,
+        category: boardgame.category,
+        rating: boardgame.rating,
+        myRating: 0,
+      };
+    } else {
+      console.log("No boardgame found");
+    }
   }
 };
 
+watch(
+  () => [isServerDown],
+  async () => getBoardgameData()
+);
 getBoardgameData();
 
 async function getBoardgameDataAsync(boardgameId: number) {
@@ -141,6 +174,14 @@ async function getBoardgameDataAsync(boardgameId: number) {
 }
 
 function deleteBoardgame() {
+  if (isServerDown) {
+    addCommandToLocalStorage({
+      command: "delete",
+      boardgameId: thisBoardgameValue.value.boardgameId,
+    });
+    navigateTo("/");
+  }
+
   const config = useRuntimeConfig();
   const serverAdress = config.public.serverAdress;
   console.log(serverAdress);

@@ -17,7 +17,7 @@
 <script lang="ts" setup>
 import axios from "axios";
 
-const { isServerDown } = useUseServerStatus();
+const { isServerDown } = await useUseServerStatus();
 const boardgamesData = ref([] as IBoardgame[]);
 
 provide("boardgamesData", {
@@ -44,7 +44,7 @@ async function getBoardgamesAsync() {
     }) as any;
     console.log(response);
     const result = response.map((boardgame: any) => ({
-      id: boardgame.boardgameId,
+      boardgameId: boardgame.boardgameId,
       title: boardgame.title,
       description: boardgame.description,
       image: "/catan.jpg",
