@@ -1,20 +1,29 @@
-import { HubConnectionBuilder, HubConnection } from "@microsoft/signalr";
+import {
+  HubConnectionBuilder,
+  HubConnection,
+  LogLevel,
+} from "@microsoft/signalr";
 
 export default defineNuxtPlugin(() => {
-  const runtimeConfig = useRuntimeConfig();
+  const config = useRuntimeConfig();
+  const serverAdress = config.public.serverAdress;
+
+  console.log("SignalR server address: ", serverAdress + "/boardgameStatsHub");
 
   const connection: HubConnection = new HubConnectionBuilder()
-    .withUrl(`${runtimeConfig.public.apiBase}/myhub`) // replace `/myhub` with your hub endpoint
+    .withUrl(`${serverAdress}/boardgameStatsHub`) // replace `/myhub` with your hub endpoint
+    .configureLogging(LogLevel.Information) // Set the logging level
     .withAutomaticReconnect()
     .build();
 
-  connection.start()
+  connection
+    .start()
     .then(() => console.log("SignalR Connected"))
-    .catch(err => console.error("SignalR Connection Error: ", err));
+    .catch((err) => console.error("SignalR Connection Error: ", err));
 
   return {
     provide: {
-      signalr: connection
-    }
+      signalr: connection,
+    },
   };
 });

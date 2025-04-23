@@ -69,7 +69,7 @@
     <ModalDeleteBoardGame
       v-if="isDeleteModalOpened"
       @close="isDeleteModalOpened = false"
-      @deleteBoardgame="deleteBoardgame"
+      @deleteBoardgame="deleteThisBoardgame"
     />
     <ModalEditBoardGame
       :boardgame="thisBoardgameValue"
@@ -82,6 +82,8 @@
 
 <script lang="ts" setup>
 import axios from "axios";
+import { deleteBoardgame, getBoardgame } from "~/api/Boardgame";
+import updateBoardgame from "~/api/Boardgame/updateBoardgame";
 
 interface Boardgame {
   boardgameId: number;
@@ -112,9 +114,9 @@ const { isServerDown } = await useUseServerStatus();
 const { addCommandToLocalStorage } = useBoardgameCommandsLocalStorrage();
 
 const getBoardgameData = async () => {
-  console.log("Server is up");
   try {
-    const responseBoardgame = await getBoardgameDataAsync(boardgameId);
+    const responseBoardgame = await getBoardgame(boardgameId);
+    console.log("Server is up");
     if (responseBoardgame) {
       thisBoardgameValue.value = {
         boardgameId: responseBoardgame.boardgameId,
@@ -157,70 +159,37 @@ watch(
 );
 getBoardgameData();
 
-async function getBoardgameDataAsync(boardgameId: number) {
-  const config = useRuntimeConfig();
-  const serverAdress = config.public.serverAdress;
-  console.log(serverAdress);
-
-  const response = await axios.get(
-    serverAdress + "/Boardgame/get-one?boardgameId=" + boardgameId
-  );
-  console.log(response.data);
-  if (response.data.length === 0) {
-    return null;
-  }
-  response.data.image = serverAdress + "/resources/" + response.data.image;
-  return response.data;
-}
-
-function deleteBoardgame() {
-  if (isServerDown) {
+async function deleteThisBoardgame() {
+  if (isServerDown.value) {
     addCommandToLocalStorage({
       command: "delete",
       boardgameId: thisBoardgameValue.value.boardgameId,
     });
-    navigateTo("/");
+  } else {
+    await deleteBoardgame(thisBoardgameValue.value.boardgameId);
   }
-
-  const config = useRuntimeConfig();
-  const serverAdress = config.public.serverAdress;
-  console.log(serverAdress);
-
-  axios
-    .delete(serverAdress + "/Boardgame/delete?boardgameId=" + boardgameId)
-    .then(() => {
-      console.log("Boardgame deleted");
-      navigateTo("/");
-    })
-    .catch((error) => {
-      console.error("Error deleting boardgame:", error);
-    });
+  navigateTo("/");
 }
 
-function editBoardgame(newBoardgame: any) {
-  const config = useRuntimeConfig();
-  const serverAdress = config.public.serverAdress;
-  console.log(serverAdress);
-
-  axios
-    .patch(serverAdress + "/Boardgame/update", {
+async function editBoardgame(newBoardgame: any) {
+  try {
+    await updateBoardgame({
       boardgameId: boardgameId,
       title: newBoardgame.title,
       description: newBoardgame.description,
       category: newBoardgame.category,
-      releaseDate: new Date(),
+      image: newBoardgame.image,
       nrOfPlayers: 0,
       playTime: 0,
       weight: 0,
       rating: thisBoardgameValue.value.rating,
-    })
-    .then(() => {
-      console.log("Boardgame udapted");
-      getBoardgameData();
-    })
-    .catch((error) => {
-      console.error("Error deleting boardgame:", error);
     });
+
+    console.log("Boardgame udapted");
+    getBoardgameData();
+  } catch (error) {
+    console.error("Error updating boardgame:", error);
+  }
 }
 
 function updateRating(rating: number) {}

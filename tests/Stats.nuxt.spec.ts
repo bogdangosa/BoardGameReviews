@@ -53,17 +53,4 @@ describe("Stats Page", () => {
     console.log(wrapper.vm.getAverageRatingByCategory());
     expect(wrapper.vm.getAverageRatingByCategory()).toEqual([0, 7, 0, 0, 0]);
   });
-
-  test("test get number of games in Category", async () => {
-    const wrapper = await mountSuspended(StatsPage, {
-      provide: {
-        boardgamesData: {
-          boardgamesData: ref(mockBoardgamesData),
-          updateBoardgamesData: () => vi.fn(),
-        },
-      },
-    });
-    console.log(wrapper.vm.getNrOfGamesInCategory());
-    expect(wrapper.vm.getNrOfGamesInCategory()).toEqual([0, 2, 0, 0, 0]);
-  });
 });

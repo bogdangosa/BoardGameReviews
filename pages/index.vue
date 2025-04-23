@@ -55,6 +55,8 @@
 </template>
 
 <script lang="ts" setup>
+import { getFilteredBoardgames } from "~/api/Boardgame";
+
 const categories = [
   "All",
   "Abstract",
@@ -86,7 +88,6 @@ function updateSelectedSorting(newSorting: string) {
 }
 
 function nextPage() {
-  console.log("nextPage");
   pagination.currentPage++;
 }
 
@@ -132,28 +133,7 @@ const getBoardGamesAsync = async (
     );
     return paginatedBoardgames;
   }
-
-  const config = useRuntimeConfig();
-  const serverAdress = config.public.serverAdress;
-
-  const response = await $fetch(
-    serverAdress +
-      `/Boardgame/get-filtered?page=${page}&itemsPerPage=${itemsPerPage}&sortOrder=${sorting}&category=${category}`,
-    {
-      method: "GET",
-    }
-  );
-  console.log(response);
-  const result = (response as any).map((boardgame: any) => ({
-    boardgameId: boardgame.boardgameId,
-    title: boardgame.title,
-    description: boardgame.description,
-    image: serverAdress + "/resources/" + boardgame.image,
-    rating: boardgame.rating,
-    category: boardgame.category,
-    myRating: null,
-  }));
-  return result;
+  return await getFilteredBoardgames(page, itemsPerPage, sorting, category);
 };
 
 const { $onBoardgameAdded } = useNuxtApp();
@@ -193,7 +173,7 @@ watch(
 );
 
 const loadMoreBoardgames = async () => {
-  pagination.currentPage++;
+  nextPage();
   const newBoardgames = await getBoardGamesAsync(
     pagination.currentPage,
     pagination.itemsPerPage,

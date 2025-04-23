@@ -31,6 +31,13 @@ const { boardgamesData, updateBoardgamesData } = inject<{
 }>("boardgamesData")!;
 
 const categories = ["Abstract", "Strategy", "Party", "Family", "Cooperative"];
+const categoriesIndex = {
+  Abstract: 0,
+  Strategy: 1,
+  Party: 2,
+  Family: 3,
+  Cooperative: 4,
+};
 
 const charts = [
   "Nr of games in category",
@@ -42,12 +49,6 @@ function updateSelectedChart(selectedChartInDropdown: string) {
   console.log(selectedChartInDropdown);
   selectedChart.value = selectedChartInDropdown;
 }
-
-const getNrOfGamesInCategory = () =>
-  categories.map(
-    (category) =>
-      boardgamesData.value.filter((game) => game.category === category).length
-  );
 
 const getMyRatingByCategory = () =>
   categories.map((category) => {
@@ -80,7 +81,7 @@ const getAverageRatingByCategory = () =>
       : 0;
   });
 
-const nrOfGamesInCategory = computed(getNrOfGamesInCategory);
+const nrOfGamesInCategory = ref([0, 0, 0, 0, 0]);
 
 const myRatingByCategory = computed(getMyRatingByCategory);
 
@@ -109,6 +110,26 @@ ChartJS.register(
   LinearScale
 );
 
+const { $signalr } = useNuxtApp();
+
+if (!$signalr) {
+  console.error("SignalR is not available");
+} else {
+  console.log("SignalR:", $signalr);
+
+  $signalr.on("ReceiveCategoryData", (data) => {
+    //data is of type {category:string,count:number}
+
+    //nrOfGamesInCategory.value = data.map((item: any) => item.count);
+
+    nrOfGamesInCategory.value = categories.map((category) => {
+      const categoryData = data.find((item: any) => item.category === category);
+      return categoryData ? categoryData.count : 0;
+    });
+
+    console.log("Category Data:", data);
+  });
+}
 const chartDataSet = computed(() => {
   if (selectedChart.value == "Nr of games in category")
     return nrOfGamesInCategory.value;
@@ -136,7 +157,6 @@ const chartOptions = ref({
 defineExpose({
   getAverageRatingByCategory,
   getMyRatingByCategory,
-  getNrOfGamesInCategory,
 });
 </script>
 

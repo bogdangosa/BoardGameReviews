@@ -19,4 +19,5 @@ export default defineNuxtConfig({
       serverAdress: process.env.SERVER_ADRESS,
     },
   },
+  plugins: ["~/plugins/signalr.client.ts"],
 });
