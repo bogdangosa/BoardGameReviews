@@ -42,9 +42,7 @@
         <div class="rating-container flex gap-2 justify-center items-center">
           <p class="c-background1">my rating:</p>
           <StarsRating
-            :rating="
-              thisBoardgameValue?.myRating ? thisBoardgameValue?.myRating : 0
-            "
+            :rating="userRating ? userRating : 0"
             @updateRating="updateRating"
           />
         </div>
@@ -66,6 +64,20 @@
         </p>
       </div>
     </main>
+    <main class="flex justify-center">
+      <div class="container p-4 sm:p-8">
+        <h2 class="c-text1">Reviews:</h2>
+        <div class="review-cards">
+          <div v-for="review in displayedReviews" class="review-card-container">
+            <CardReview
+              username="User"
+              :message="review.message"
+              :rating="review.rating"
+            />
+          </div>
+        </div>
+      </div>
+    </main>
     <ModalDeleteBoardGame
       v-if="isDeleteModalOpened"
       @close="isDeleteModalOpened = false"
@@ -81,9 +93,13 @@
 </template>
 
 <script lang="ts" setup>
-import axios from "axios";
 import { deleteBoardgame, getBoardgame } from "~/api/Boardgame";
 import updateBoardgame from "~/api/Boardgame/updateBoardgame";
+import {
+  getReviewOfUser,
+  addReview,
+  getAllReviewsOfBoardgame,
+} from "~/api/Review";
 
 interface Boardgame {
   boardgameId: number;
@@ -98,7 +114,10 @@ interface Boardgame {
 const isDeleteModalOpened = ref(false);
 const isEditModalOpened = ref(false);
 const route = useRoute();
-
+const userId = 1;
+const userRating = ref(0);
+const userRatingId = ref(0);
+const displayedReviews = ref([] as IReview[]);
 const boardgameId = Number(route.params.id);
 
 const thisBoardgameValue = ref<Boardgame>({
@@ -155,9 +174,43 @@ const getBoardgameData = async () => {
 
 watch(
   () => [isServerDown],
-  async () => getBoardgameData()
+  async () => {
+    getUserRating();
+    getBoardgameData();
+    getReviewsData();
+  }
 );
+getUserRating();
 getBoardgameData();
+getReviewsData();
+
+async function getReviewsData() {
+  try {
+    const reviewsData = await getAllReviewsOfBoardgame(boardgameId);
+    if (reviewsData) {
+      displayedReviews.value = reviewsData;
+    } else {
+      console.log("No reviews found");
+    }
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+  }
+}
+
+async function getUserRating() {
+  try {
+    const review = await getReviewOfUser(boardgameId, userId);
+    if (review) {
+      userRating.value = review.rating;
+      userRatingId.value = review.reviewId;
+      thisBoardgameValue.value.myRating = review.rating;
+    } else {
+      console.log("No review found");
+    }
+  } catch (error) {
+    console.error("Error fetching user rating:", error);
+  }
+}
 
 async function deleteThisBoardgame() {
   if (isServerDown.value) {
@@ -192,7 +245,17 @@ async function editBoardgame(newBoardgame: any) {
   }
 }
 
-function updateRating(rating: number) {}
+function updateRating(rating: number) {
+  console.log("Rating updated:", rating);
+  userRating.value = rating;
+  addReview({
+    reviewId: userRatingId.value,
+    boardgameId: thisBoardgameValue.value.boardgameId,
+    userId: userId,
+    rating: rating,
+    message: "",
+  });
+}
 
 defineExpose({
   deleteBoardgame,
@@ -204,6 +267,13 @@ defineExpose({
 <style>
 .hero-game {
   position: relative;
+}
+.review-card-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .cover-image {
@@ -236,5 +306,11 @@ defineExpose({
 }
 .button {
   cursor: pointer;
+}
+.review-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 2rem;
 }
 </style>

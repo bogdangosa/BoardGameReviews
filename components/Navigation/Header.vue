@@ -14,6 +14,10 @@
             @click="openAddBoardgameModal"
             >Add your own</Button
           >
+          <Button v-if="userData?.userId === undefined" @click="openLoginModal"
+            >Login</Button
+          >
+          <Button v-else @click="logout">Logout</Button>
         </ul>
       </nav>
       <p v-if="isServerDown" class="server-down-message text-sm font-bold">
@@ -32,9 +36,24 @@ export default {
       default: false,
     },
   },
+  setup() {
+    const { userData } = inject("userData");
+    console.log("userData", userData.value);
+
+    return {
+      userData,
+    };
+  },
   methods: {
     openAddBoardgameModal() {
       this.$emit("openAddBoardgameModal");
+    },
+    openLoginModal() {
+      this.$emit("openLoginModal");
+    },
+    logout() {
+      console.log("Logout clicked");
+      this.$emit("logout");
     },
   },
 };

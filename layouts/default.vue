@@ -1,24 +1,53 @@
 <template>
   <div>
     <NavigationHeader
-      @openAddBoardgameModal="isModalOpened = true"
+      @openAddBoardgameModal="isAddBoardgameModalOpened = true"
+      @openLoginModal="isLoginModalOpened = true"
+      @logout="logout"
       :isServerDown="isServerDown"
     ></NavigationHeader>
     <slot />
     <ModalAddBoardGame
-      v-if="isModalOpened"
-      @close="isModalOpened = false"
+      v-if="isAddBoardgameModalOpened"
+      @close="isAddBoardgameModalOpened = false"
       @addBoardgame="addBoardgame"
       @click=""
+    />
+    <ModalLogin
+      v-if="isLoginModalOpened"
+      @close="isLoginModalOpened = false"
+      @login="loginAsync"
+      @openSignUp="
+        isSignUpModalOpened = true;
+        isLoginModalOpened = false;
+      "
+    />
+    <ModalSignUp
+      v-if="isSignUpModalOpened"
+      @close="isSignUpModalOpened = false"
+      @signup="signupAsync"
+      @openLogin="
+        isLoginModalOpened = true;
+        isSignUpModalOpened = false;
+      "
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import axios from "axios";
+import { login } from "~/api/User";
 
 const { isServerDown } = await useUseServerStatus();
 const boardgamesData = ref([] as IBoardgame[]);
+
+const userData = ref({} as IUser | {});
+
+provide("userData", {
+  userData: userData,
+  updateUserData: (newData: any) => {
+    userData.value = newData;
+  },
+});
 
 provide("boardgamesData", {
   boardgamesData: boardgamesData,
@@ -29,7 +58,25 @@ provide("boardgamesData", {
 
 boardgamesData.value = await getBoardgamesAsync();
 
-const isModalOpened = ref(false);
+const isAddBoardgameModalOpened = ref(false);
+const isLoginModalOpened = ref(false);
+const isSignUpModalOpened = ref(false);
+
+async function loginAsync(payload: { username: string; password: string }) {
+  const response = await login(payload.username, payload.password);
+  if (response) {
+    userData.value = response;
+    console.log("User data updated:", userData.value);
+    isLoginModalOpened.value = false;
+  } else {
+    console.log("Login failed");
+  }
+}
+async function logout() {
+  userData.value = {};
+  console.log("User logged out");
+}
+async function signupAsync(payload: { username: string; password: string }) {}
 
 async function getBoardgamesAsync() {
   const config = useRuntimeConfig();
