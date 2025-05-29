@@ -39,9 +39,9 @@
 </template>
 
 <script lang="ts" setup>
-import { getAllLogs } from "~/api/Log";
-import deleteAllLogs from "~/api/Log/deleteAllLogs";
-import { getMonitoredUsers } from "~/api/User";
+import { getAllLogs } from "~/api-calls/Log";
+import deleteAllLogs from "~/api-calls/Log/deleteAllLogs";
+import { getMonitoredUsers } from "~/api-calls/User";
 
 const { userData } = inject<{ userData: any }>("userData") || {};
 

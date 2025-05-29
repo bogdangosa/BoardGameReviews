@@ -104,14 +104,14 @@
 <script lang="ts" setup>
 import { el } from "@nuxt/ui/runtime/locale/index.js";
 import { get } from "@nuxt/ui/runtime/utils/index.js";
-import { deleteBoardgame, getBoardgame } from "~/api/Boardgame";
-import updateBoardgame from "~/api/Boardgame/updateBoardgame";
+import { deleteBoardgame, getBoardgame } from "~/api-calls/Boardgame";
+import updateBoardgame from "~/api-calls/Boardgame/updateBoardgame";
 import {
   getReviewOfUser,
   addReview,
   getAllReviewsOfBoardgame,
   deleteReview,
-} from "~/api/Review";
+} from "~/api-calls/Review";
 
 interface Boardgame {
   boardgameId: number;

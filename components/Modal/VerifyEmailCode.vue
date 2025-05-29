@@ -9,15 +9,15 @@
 </template>
 
 <script lang="ts">
-import verifyEmail from '~/api/User/verifyEmail';
+import verifyEmail from "~/api-calls/User/verifyEmail";
 
 export default {
   name: "VerifyEmailCode",
   props: {
     user: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   methods: {
     closeModal() {

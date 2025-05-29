@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
 import { tr } from "@nuxt/ui/runtime/locale/index.js";
-import { login, signup } from "~/api/User";
+import { login, signup } from "~/api-calls/User";
 
 const { isServerDown } = await useUseServerStatus();
 const boardgamesData = ref([] as IBoardgame[]);

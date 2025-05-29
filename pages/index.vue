@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getFilteredBoardgames } from "~/api/Boardgame";
+import { getFilteredBoardgames } from "~/api-calls/Boardgame";
 
 const categories = [
   "All",
