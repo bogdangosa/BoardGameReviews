@@ -6,8 +6,8 @@ export const useUseServerStatus = () => {
     try {
       const config = useRuntimeConfig();
       const serverAdress = config.public.serverAdress;
-      const result = await $fetch(serverAdress + "/Boardgame/get-all");
-      localStorage.setItem("boardgameList", JSON.stringify(result));
+      const result = await $fetch(serverAdress + "/Boardgame/is-available");
+      //localStorage.setItem("boardgameList", JSON.stringify(result));
       if (isServerDown) executeCommands();
       isServerDown.value = false;
     } catch {

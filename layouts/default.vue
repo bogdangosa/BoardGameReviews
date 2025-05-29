@@ -31,16 +31,22 @@
         isSignUpModalOpened = false;
       "
     />
+    <ModalVerifyEmailCode
+      :user="userData.value"
+      v-if="isVerifyEmailOpened"
+      @close="isVerifyEmailOpened = false"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { login } from "~/api/User";
+import { tr } from "@nuxt/ui/runtime/locale/index.js";
+import { login, signup } from "~/api/User";
 
 const { isServerDown } = await useUseServerStatus();
 const boardgamesData = ref([] as IBoardgame[]);
 
-const userData = ref({} as IUser | {});
+const userData = ref({} as IUser | any);
 
 provide("userData", {
   userData: userData,
@@ -49,18 +55,10 @@ provide("userData", {
   },
 });
 
-provide("boardgamesData", {
-  boardgamesData: boardgamesData,
-  updateBoardgamesData: (newData: any) => {
-    boardgamesData.value = newData;
-  },
-});
-
-boardgamesData.value = await getBoardgamesAsync();
-
 const isAddBoardgameModalOpened = ref(false);
 const isLoginModalOpened = ref(false);
 const isSignUpModalOpened = ref(false);
+const isVerifyEmailOpened = ref(false);
 
 async function loginAsync(payload: { username: string; password: string }) {
   const response = await login(payload.username, payload.password);
@@ -76,34 +74,24 @@ async function logout() {
   userData.value = {};
   console.log("User logged out");
 }
-async function signupAsync(payload: { username: string; password: string }) {}
-
-async function getBoardgamesAsync() {
-  const config = useRuntimeConfig();
-  const serverAdress = config.public.serverAdress;
-  try {
-    const response = (await $fetch(serverAdress + "/Boardgame/get-all"),
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }) as any;
-    console.log(response);
-    const result = response.map((boardgame: any) => ({
-      boardgameId: boardgame.boardgameId,
-      title: boardgame.title,
-      description: boardgame.description,
-      image: "/catan.jpg",
-      rating: boardgame.rating,
-      category: boardgame.category,
-      myRating: null,
-    }));
-    console.log(result);
-    return result;
-  } catch (error) {
-    console.log("Error fetching boardgames:", error);
-    return [];
+async function signupAsync(payload: {
+  username: string;
+  email: string;
+  password: string;
+}) {
+  const response = (await signup(
+    payload.username,
+    payload.email,
+    payload.password
+  )) as any;
+  if (response.wasSignupSuccessfull) {
+    userData.value = response;
+    console.log("User data updated:", userData.value);
+    isLoginModalOpened.value = false;
+    isSignUpModalOpened.value = false;
+    isVerifyEmailOpened.value = true;
+  } else {
+    console.log("Login failed");
   }
 }
 
@@ -128,10 +116,12 @@ async function addBoardgame(newBoardgame: IBoardgame) {
   const response = await $fetch(serverAdress + "/Boardgame/add", {
     method: "POST",
     body: formData,
+    headers: {
+      Authorization: `Bearer ${userData.value.accessToken}`,
+    },
   });
 
   console.log(response);
-  boardgamesData.value = await getBoardgamesAsync();
   $boardgameAdded();
   console.log("boardgameAdded1");
 }

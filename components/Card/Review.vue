@@ -7,20 +7,44 @@
         </div>
         <h3>{{ username }}</h3>
       </div>
-      <p class="review-message">"{{ message }}"</p>
+
+      <p v-if="message != ''" class="review-message">{{ message }}</p>
     </div>
-    <div class="rating" :class="ratingClass">
-      <p>{{ rating }}</p>
+    <div class="flex gap-2 justify-center items-center">
+      <div v-if="isReviewer" class="flex gap-2 justify-center items-center">
+        <img
+          class="button"
+          data-test="edit-button"
+          @click="editReview"
+          :src="`/edit-black.svg`"
+          alt=""
+        />
+        <img
+          class="button"
+          data-test="delete-button"
+          @click="deleteReview"
+          :src="`/delete-red.svg`"
+          alt=""
+        />
+      </div>
+      <div class="rating" :class="ratingClass">
+        <p>{{ rating }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { tr } from "@nuxt/ui/runtime/locale/index.js";
 import { computed } from "vue";
 
 export default {
   name: "ReviewCard",
   props: {
+    reviewId: {
+      type: Number,
+      required: true,
+    },
     username: {
       type: String,
       required: true,
@@ -37,7 +61,7 @@ export default {
       type: Number,
       default: 0,
     },
-    canDelete: {
+    isReviewer: {
       type: Boolean,
       default: false,
     },
@@ -48,11 +72,15 @@ export default {
       if (props.rating > 5) return "medium";
       return "low";
     });
-    return { ratingClass };
+    const reviewId = props.reviewId;
+    return { ratingClass, reviewId };
   },
   methods: {
     deleteReview() {
       this.$emit("deleteReview", this.reviewId);
+    },
+    editReview() {
+      this.$emit("editReview", this.reviewId);
     },
   },
 };

@@ -17,6 +17,17 @@
           />
         </div>
         <div class="form-group">
+          <p for="name">email:</p>
+          <input
+            data-test="boardgame-title-input"
+            class="bg-neutral1 w-full p-4"
+            id="name"
+            type="text"
+            required
+            v-model="email"
+          />
+        </div>
+        <div class="form-group">
           <p for="name">Password:</p>
           <input
             data-test="boardgame-title-input"
@@ -49,16 +60,21 @@
 <script lang="ts" setup>
 const emit = defineEmits<{
   (e: "close"): void;
-  (e: "signup", payload: { username: string; password: string }): void;
+  (
+    e: "signup",
+    payload: { username: string; email: string; password: string }
+  ): void;
   (e: "openLogin"): void;
 }>();
 
 const username = ref("");
 const password = ref("");
+const email = ref("");
 
 function signUp() {
   emit("signup", {
     username: username.value,
+    email: email.value,
     password: password.value,
   });
 }

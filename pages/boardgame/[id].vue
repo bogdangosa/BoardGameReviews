@@ -11,7 +11,9 @@
           />
           <div class="text-container">
             <div class="score-container flex justify-center items-center">
-              <span class="score">{{ thisBoardgameValue?.rating }} </span>
+              <span class="score"
+                >{{ thisBoardgameValue?.rating.toFixed(2) }}
+              </span>
             </div>
             <div class="flex gap-4">
               <h2 class="c-background1 bold">
@@ -39,7 +41,10 @@
             <p class="c-background1">{{ thisBoardgameValue?.description }}</p>
           </div>
         </div>
-        <div class="rating-container flex gap-2 justify-center items-center">
+        <div
+          v-if="userId != undefined && userId > 0"
+          class="rating-container flex gap-2 justify-center items-center"
+        >
           <p class="c-background1">my rating:</p>
           <StarsRating
             :rating="userRating ? userRating : 0"
@@ -71,8 +76,12 @@
           <div v-for="review in displayedReviews" class="review-card-container">
             <CardReview
               username="User"
+              :reviewId="review.reviewId"
               :message="review.message"
               :rating="review.rating"
+              :isReviewer="userId === review.userId"
+              @deleteReview="deleteReviewAsync"
+              @editReview="editReview"
             />
           </div>
         </div>
@@ -93,12 +102,15 @@
 </template>
 
 <script lang="ts" setup>
+import { el } from "@nuxt/ui/runtime/locale/index.js";
+import { get } from "@nuxt/ui/runtime/utils/index.js";
 import { deleteBoardgame, getBoardgame } from "~/api/Boardgame";
 import updateBoardgame from "~/api/Boardgame/updateBoardgame";
 import {
   getReviewOfUser,
   addReview,
   getAllReviewsOfBoardgame,
+  deleteReview,
 } from "~/api/Review";
 
 interface Boardgame {
@@ -114,11 +126,18 @@ interface Boardgame {
 const isDeleteModalOpened = ref(false);
 const isEditModalOpened = ref(false);
 const route = useRoute();
-const userId = 1;
 const userRating = ref(0);
 const userRatingId = ref(0);
 const displayedReviews = ref([] as IReview[]);
 const boardgameId = Number(route.params.id);
+
+const { userData } = inject<{ userData: any }>("userData") || {};
+const userId = computed(() => {
+  if (userData.value) {
+    return userData.value.userId;
+  }
+  return 0;
+});
 
 const thisBoardgameValue = ref<Boardgame>({
   boardgameId: boardgameId,
@@ -199,7 +218,7 @@ async function getReviewsData() {
 
 async function getUserRating() {
   try {
-    const review = await getReviewOfUser(boardgameId, userId);
+    const review = await getReviewOfUser(boardgameId, userId.value);
     if (review) {
       userRating.value = review.rating;
       userRatingId.value = review.reviewId;
@@ -213,30 +232,46 @@ async function getUserRating() {
 }
 
 async function deleteThisBoardgame() {
+  let wasRequestSuccessfull = undefined;
   if (isServerDown.value) {
     addCommandToLocalStorage({
       command: "delete",
       boardgameId: thisBoardgameValue.value.boardgameId,
     });
+    wasRequestSuccessfull = "success"; // Simulate success in offline mode
   } else {
-    await deleteBoardgame(thisBoardgameValue.value.boardgameId);
+    wasRequestSuccessfull = await deleteBoardgame(
+      thisBoardgameValue.value.boardgameId,
+      userData.value.accessToken
+    );
   }
-  navigateTo("/");
+  console.log("Boardgame deleted:", wasRequestSuccessfull);
+  if (wasRequestSuccessfull === "unauthorized") {
+    console.log("Unauthorized request, redirecting to login");
+    return;
+  }
+  if (wasRequestSuccessfull) navigateTo("/");
+  else {
+    console.error("Error deleting boardgame");
+  }
 }
 
 async function editBoardgame(newBoardgame: any) {
   try {
-    await updateBoardgame({
-      boardgameId: boardgameId,
-      title: newBoardgame.title,
-      description: newBoardgame.description,
-      category: newBoardgame.category,
-      image: newBoardgame.image,
-      nrOfPlayers: 0,
-      playTime: 0,
-      weight: 0,
-      rating: thisBoardgameValue.value.rating,
-    });
+    await updateBoardgame(
+      {
+        boardgameId: boardgameId,
+        title: newBoardgame.title,
+        description: newBoardgame.description,
+        category: newBoardgame.category,
+        image: newBoardgame.image,
+        nrOfPlayers: 0,
+        playTime: 0,
+        weight: 0,
+        rating: thisBoardgameValue.value.rating,
+      },
+      userData.value.accessToken
+    );
 
     console.log("Boardgame udapted");
     getBoardgameData();
@@ -245,16 +280,40 @@ async function editBoardgame(newBoardgame: any) {
   }
 }
 
-function updateRating(rating: number) {
+async function updateRating(rating: number) {
   console.log("Rating updated:", rating);
   userRating.value = rating;
-  addReview({
-    reviewId: userRatingId.value,
-    boardgameId: thisBoardgameValue.value.boardgameId,
-    userId: userId,
-    rating: rating,
-    message: "",
-  });
+  const response = await addReview(
+    {
+      reviewId: userRatingId.value,
+      boardgameId: thisBoardgameValue.value.boardgameId,
+      userId: userId.value,
+      rating: rating,
+      message: "",
+    },
+    userData.value.accessToken
+  );
+  getBoardgameData();
+  getReviewsData();
+  getUserRating();
+}
+
+async function deleteReviewAsync(reviewId: number) {
+  console.log("Delete review:", reviewId);
+  const response = await deleteReview(reviewId, userData.value.accessToken);
+  if (response) {
+    console.log("Review deleted");
+    getBoardgameData();
+    getReviewsData();
+    getUserRating();
+  } else {
+    console.log("Error deleting review");
+  }
+}
+
+function editReview(reviewId: number) {
+  console.log("Edit review:", reviewId);
+  // Implement edit review logic here
 }
 
 defineExpose({

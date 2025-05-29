@@ -8,7 +8,9 @@
         <ul>
           <li class=""><NuxtLink class="nav-link" to="/">Browse</NuxtLink></li>
           <li><NuxtLink class="nav-link" to="/stats">Stats</NuxtLink></li>
-          <li><NuxtLink class="nav-link" to="/account">Account</NuxtLink></li>
+          <li v-if="userData?.userId !== undefined">
+            <NuxtLink class="nav-link" to="/account">Account</NuxtLink>
+          </li>
           <Button
             data-test="add-boardgame-button"
             @click="openAddBoardgameModal"

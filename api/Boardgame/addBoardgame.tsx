@@ -1,6 +1,9 @@
 import getApiUrl from "../getApiUrl";
 
-export default async function addBoardgame(newBoardgame: IBoardgame) {
+export default async function addBoardgame(
+  newBoardgame: IBoardgame,
+  accessToken: string
+) {
   const url = getApiUrl("/Boardgame/add");
 
   const formData = new FormData();
@@ -18,6 +21,9 @@ export default async function addBoardgame(newBoardgame: IBoardgame) {
   const response = await $fetch(url, {
     method: "POST",
     body: formData,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
 
   return response;

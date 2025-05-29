@@ -1,10 +1,7 @@
 import getApiUrl from "../getApiUrl";
 
-export default async function deleteBoardgame(
-  boardgameId: number,
-  accessToken: string
-) {
-  const url = getApiUrl(`/Boardgame/delete?boardgameId=${boardgameId}`);
+export default async function deleteAllLogs(accessToken: string) {
+  const url = getApiUrl("/Admin/delete-all-logs");
 
   try {
     const response = await $fetch(url, {
@@ -16,10 +13,7 @@ export default async function deleteBoardgame(
     });
     return response;
   } catch (error: any) {
-    if (error?.response?.status === 401) {
-      return "unauthorized";
-    }
-    console.error("Error deleting boardgame:", error);
+    console.error("Error deleting:", error);
     throw error;
   }
 }

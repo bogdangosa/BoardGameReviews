@@ -1,5 +1,5 @@
 export default defineNuxtPlugin((nuxtApp) => {
-  if ("$boardgameAdded" in nuxtApp) return; // 🛑 Prevent redefinition on HMR
+  if ("$boardgameAdded" in nuxtApp) return;
 
   const listeners: (() => void)[] = [];
 
